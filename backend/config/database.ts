@@ -4,7 +4,7 @@ import dotenv from 'dotenv'
 dotenv.config()
 
 const sequelize = new Sequelize(process.env.DATABASE_URL || '', {
-  dialect: 'postgres', // ← Changed from mysql to postgres
+  dialect: 'postgres',
   logging: false,
   pool: {
     max: 5,
@@ -15,7 +15,7 @@ const sequelize = new Sequelize(process.env.DATABASE_URL || '', {
   dialectOptions: {
     ssl: {
       require: true,
-      rejectUnauthorized: false, // For Neon SSL
+      rejectUnauthorized: false,
     }
   }
 })
