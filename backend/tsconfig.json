@@ -9,7 +9,7 @@
     "noUnusedLocals": false,
     "noUnusedParameters": false,
     "skipLibCheck": true,
-    "outDir": "./dist",
+    "outDir": "./",                    // ← CHANGE THIS
     "rootDir": "./",
     "resolveJsonModule": true
   },
