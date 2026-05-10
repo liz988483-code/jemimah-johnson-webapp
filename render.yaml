@@ -1,0 +1,46 @@
+services:
+  - type: web
+    name: jemimah-johnson-backend
+    env: node
+    buildCommand: cd backend && npm install && npm run build
+    startCommand: cd backend && npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 5000
+      - key: DB_HOST
+        fromDatabase:
+          name: jemimah-johnson-db
+          property: host
+      - key: DB_PORT
+        fromDatabase:
+          name: jemimah-johnson-db
+          property: port
+      - key: DB_USER
+        fromDatabase:
+          name: jemimah-johnson-db
+          property: user
+      - key: DB_PASSWORD
+        fromDatabase:
+          name: jemimah-johnson-db
+          property: password
+      - key: DB_NAME
+        fromDatabase:
+          name: jemimah-johnson-db
+          property: database
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_EXPIRE
+        value: 30d
+      - key: ADMIN_EMAIL
+        value: admin@jemimahjohnston.com
+      - key: ADMIN_PASSWORD
+        generateValue: true
+      - key: FRONTEND_URL
+        value: https://your-vercel-frontend-url.vercel.app
+
+databases:
+  - name: jemimah-johnson-db
+    databaseName: jemimah_johnson
+    user: jemimah_johnson_user
