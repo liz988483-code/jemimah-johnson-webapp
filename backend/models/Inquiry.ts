@@ -1,5 +1,5 @@
 import { DataTypes, Model, Optional } from 'sequelize'
-import sequelize from '../config/database'
+import { sequelize } from '../config/database'
 import Registration from './Registration'
 
 interface InquiryAttributes {
@@ -8,7 +8,7 @@ interface InquiryAttributes {
   email: string
   phone: string
   entityType: 'company' | 'sole-proprietorship'
-  packageTier: 'basic' | 'standard' | 'premium' 
+  packageTier: 'basic' | 'standard' | 'premium'
   proposedName: string
   businessDescription: string
   urgency: 'low' | 'medium' | 'high'
@@ -19,8 +19,10 @@ interface InquiryAttributes {
   registrationId?: number
 }
 
-interface InquiryCreationAttributes extends Optional<InquiryAttributes, 
-  'id' | 'additionalInfo' | 'packageTier' | 'status' | 'createdAt' | 'updatedAt' | 'registrationId'> {}
+interface InquiryCreationAttributes extends Optional<
+  InquiryAttributes,
+  'id' | 'additionalInfo' | 'packageTier' | 'status' | 'createdAt' | 'updatedAt' | 'registrationId'
+> {}
 
 class Inquiry extends Model<InquiryAttributes, InquiryCreationAttributes> implements InquiryAttributes {
   public id!: number
@@ -28,7 +30,7 @@ class Inquiry extends Model<InquiryAttributes, InquiryCreationAttributes> implem
   public email!: string
   public phone!: string
   public entityType!: 'company' | 'sole-proprietorship'
-  packageTier: 'basic' | 'standard' | 'premium' 
+  public packageTier!: 'basic' | 'standard' | 'premium'
   public proposedName!: string
   public businessDescription!: string
   public urgency!: 'low' | 'medium' | 'high'
@@ -68,6 +70,7 @@ Inquiry.init(
     packageTier: {
       type: DataTypes.ENUM('basic', 'standard', 'premium'),
       allowNull: false,
+      defaultValue: 'basic',
     },
     proposedName: {
       type: DataTypes.STRING(255),
@@ -113,7 +116,7 @@ Inquiry.init(
   }
 )
 
-// Set up associations after all models are imported
+// Associations
 Inquiry.hasOne(Registration, { foreignKey: 'inquiryId', as: 'registration' })
 Registration.belongsTo(Inquiry, { foreignKey: 'inquiryId', as: 'inquiry' })
 

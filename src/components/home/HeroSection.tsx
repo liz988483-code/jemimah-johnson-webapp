@@ -11,15 +11,6 @@ const HeroSection: React.FC = () => {
       <div className="absolute inset-0 bg-gradient-to-br from-primary-50 via-white to-secondary-50">
         <div className="absolute inset-0 bg-black/5" />
       </div>
-      
-      {/* Hero Image */}
-      <div className="absolute inset-0">
-        <img
-          src="/public/images/hero-bg.jpg"
-          alt="Professional business services"
-          className="w-full h-full object-cover opacity-10"
-        />
-      </div>
 
       {/* Content */}
       <div className="relative z-10 section-padding">

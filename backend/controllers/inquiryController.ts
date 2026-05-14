@@ -6,7 +6,19 @@ import { sendInquiryNotification } from '../services/emailService'
 // Create a new inquiry
 export const createInquiry = async (req: Request, res: Response) => {
   try {
-    const inquiryData = req.body
+    const { name, email, phone, entityType, packageTier, proposedName, businessDescription, urgency, additionalInfo } = req.body
+    
+    const inquiryData = {
+      name,
+      email,
+      phone,
+      entityType,
+      packageTier: packageTier || 'basic',
+      proposedName,
+      businessDescription,
+      urgency: urgency || 'medium',
+      additionalInfo
+    }
     
     const inquiry = await Inquiry.create(inquiryData)
     

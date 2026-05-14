@@ -1,5 +1,5 @@
 import { DataTypes, Model, Optional } from 'sequelize'
-import sequelize from '../config/database'
+import { sequelize } from '../config/database'
 
 interface RegistrationAttributes {
   id: number
@@ -20,12 +20,16 @@ interface RegistrationAttributes {
   updatedAt: Date
 }
 
-interface RegistrationCreationAttributes extends Optional<RegistrationAttributes, 
-  'id' | 'crNumber' | 'kraPin' | 'ifmisNumber' | 'nssfNumber' | 'nhifNumber' | 
-  'businessRegistrationNumber' | 'vatNumber' | 'submissionDate' | 'approvalDate' | 
-  'notes' | 'documents' | 'status' | 'createdAt' | 'updatedAt'> {}
+interface RegistrationCreationAttributes extends Optional<
+  RegistrationAttributes,
+  'id' | 'crNumber' | 'kraPin' | 'ifmisNumber' | 'nssfNumber' | 'nhifNumber' |
+  'businessRegistrationNumber' | 'vatNumber' | 'submissionDate' | 'approvalDate' |
+  'notes' | 'documents' | 'status' | 'createdAt' | 'updatedAt'
+> {}
 
-class Registration extends Model<RegistrationAttributes, RegistrationCreationAttributes> implements RegistrationAttributes {
+class Registration extends Model<RegistrationAttributes, RegistrationCreationAttributes>
+  implements RegistrationAttributes {
+
   public id!: number
   public inquiryId!: number
   public crNumber?: string

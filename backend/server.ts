@@ -4,13 +4,15 @@ import helmet from 'helmet'
 import morgan from 'morgan'
 import dotenv from 'dotenv'
 
-import sequelize from './config/database'
+import { sequelize } from './config/database'
+
 import apiRoutes from './routes/api'
 import adminRoutes from './routes/admin'
 import clientRoutes from './routes/client'
 import auditLogRoutes from './routes/auditLogs'
 import documentRoutes from './routes/documents'
 import mpesaRoutes from './routes/mpesa'
+
 import { errorHandler, notFound } from './middleware/errorHandler'
 
 dotenv.config()
@@ -18,7 +20,7 @@ dotenv.config()
 const app = express()
 const PORT = process.env.PORT || 5001
 
-// Connect to MySQL
+// Connect DB
 sequelize.authenticate()
   .then(() => {
     console.log('MySQL connected successfully')
@@ -35,7 +37,7 @@ sequelize.authenticate()
 // Middleware
 app.use(helmet())
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:3001', // ✅ FIXED: Changed from 3002 to 3001
+  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
   credentials: true
 }))
 app.use(morgan('combined'))
@@ -50,21 +52,21 @@ app.use('/api/audit-logs', auditLogRoutes)
 app.use('/api/documents', documentRoutes)
 app.use('/api/mpesa', mpesaRoutes)
 
-// Health check
+// Health
 app.get('/api/health', (_req, res) => {
-  res.status(200).json({ 
-    success: true, 
+  res.status(200).json({
+    success: true,
     message: 'Server is running',
     timestamp: new Date().toISOString()
   })
 })
 
-// Error handling
+// Errors
 app.use(notFound)
 app.use(errorHandler)
 
-// 404 handler
-app.use('*', (_, res) => {
+// 404 fallback
+app.use('*', (_req, res) => {
   res.status(404).json({ error: 'Route not found' })
 })
 
