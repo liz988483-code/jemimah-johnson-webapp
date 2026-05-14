@@ -1,4 +1,4 @@
-import { Routes, Route } from 'react-router-dom'
+import { Routes, Route, Navigate } from 'react-router-dom'
 import MainLayout from './layouts/MainLayout'
 import Home from './pages/Home'
 import Services from './pages/Services'
@@ -8,8 +8,8 @@ import Contact from './pages/Contact'
 import About from './pages/About'
 import Privacy from './pages/Privacy'
 import Terms from './pages/Terms'
-import Login from '../admin/Login'
 import ProtectedRoute from '../admin/ProtectedRoute'
+import AdminLayout from '../admin/AdminLayout'
 import Dashboard from '../admin/Dashboard'
 import Clients from '../admin/Clients'
 import Inquiries from '../admin/Inquiries'
@@ -37,23 +37,14 @@ function App() {
         </Route>
 
         {/* Admin Routes */}
-        <Route path="/admin/login" element={<Login />} />
-        <Route
-          path="/admin"
-          element={
-            <ProtectedRoute>
-              <div className="min-h-screen bg-gray-100">
-                <Routes>
-                  <Route path="dashboard" element={<Dashboard />} />
-                  <Route path="clients" element={<Clients />} />
-                  <Route path="inquiries" element={<Inquiries />} />
-                  <Route path="packages" element={<Packages />} />
-                  <Route index element={<Dashboard />} />
-                </Routes>
-              </div>
-            </ProtectedRoute>
-          }
-        />
+        <Route path="/admin/login" element={<Navigate to="/login" replace />} />
+        <Route element={<ProtectedRoute><AdminLayout /></ProtectedRoute>}>
+          <Route path="/admin/dashboard" element={<Dashboard />} />
+          <Route path="/admin/clients" element={<Clients />} />
+          <Route path="/admin/inquiries" element={<Inquiries />} />
+          <Route path="/admin/packages" element={<Packages />} />
+          <Route path="/admin" element={<Dashboard />} />
+        </Route>
       </Routes>
     </div>
   )

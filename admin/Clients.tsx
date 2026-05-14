@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { Search, Eye, Edit, Trash2, Calendar, Mail, Phone, LogOut } from 'lucide-react'
+import { Search, Eye, Edit, Trash2, Calendar, Mail, Phone } from 'lucide-react'
 
 interface Client {
   _id: string
@@ -23,15 +22,9 @@ interface Pagination {
 }
 
 const Clients: React.FC = () => {
-  const navigate = useNavigate()
   const [clients, setClients] = useState<Client[]>([])
   const [loading, setLoading] = useState(true)
 
-  const handleLogout = () => {
-    localStorage.removeItem('adminToken')
-    localStorage.removeItem('adminUser')
-    navigate('/admin/login')
-  }
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState('')
   const [pagination, setPagination] = useState<Pagination>({
@@ -154,13 +147,6 @@ const Clients: React.FC = () => {
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold text-gray-900">Clients</h1>
         <div className="flex items-center space-x-4">
-          <button
-            onClick={handleLogout}
-            className="flex items-center space-x-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
-          >
-            <LogOut className="h-4 w-4" />
-            <span>Logout</span>
-          </button>
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
             <input
@@ -231,12 +217,12 @@ const Clients: React.FC = () => {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex flex-wrap gap-1">
-                      {client.services.slice(0, 2).map((service, index) => (
+                      {(Array.isArray(client.services) ? client.services : []).slice(0, 2).map((service, index) => (
                         <span key={index} className="px-2 py-1 text-xs bg-gray-100 text-gray-800 rounded">
                           {service}
                         </span>
                       ))}
-                      {client.services.length > 2 && (
+                      {Array.isArray(client.services) && client.services.length > 2 && (
                         <span className="px-2 py-1 text-xs bg-gray-100 text-gray-800 rounded">
                           +{client.services.length - 2} more
                         </span>
@@ -425,7 +411,7 @@ const Clients: React.FC = () => {
                       <div>
                         <label className="block text-sm font-medium text-gray-700">Services</label>
                         <div className="mt-1 flex flex-wrap gap-1">
-                          {(editMode ? formData.services || [] : selectedClient.services).map((service, index) => (
+                          {(editMode ? formData.services || [] : Array.isArray(selectedClient.services) ? selectedClient.services : []).map((service, index) => (
                             <span key={index} className="px-2 py-1 text-xs bg-gray-100 text-gray-800 rounded">
                               {service}
                             </span>

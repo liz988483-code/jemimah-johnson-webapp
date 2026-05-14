@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { Search, Plus, Edit, Trash2, DollarSign, Clock, CheckCircle, XCircle, Building2, User, LogOut } from 'lucide-react'
+import { Search, Plus, Edit, Trash2, DollarSign, Clock, CheckCircle, XCircle, Building2, User } from 'lucide-react'
 
 interface ServicePackage {
   _id: string
@@ -21,15 +20,9 @@ interface ServicePackage {
 }
 
 const Packages: React.FC = () => {
-  const navigate = useNavigate()
   const [packages, setPackages] = useState<ServicePackage[]>([])
   const [loading, setLoading] = useState(true)
 
-  const handleLogout = () => {
-    localStorage.removeItem('adminToken')
-    localStorage.removeItem('adminUser')
-    navigate('/admin/login')
-  }
   const [search, setSearch] = useState('')
   const [typeFilter, setTypeFilter] = useState('')
   const [showModal, setShowModal] = useState(false)
@@ -257,13 +250,6 @@ const Packages: React.FC = () => {
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold text-gray-900">Service Packages</h1>
         <div className="flex items-center space-x-4">
-          <button
-            onClick={handleLogout}
-            className="flex items-center space-x-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
-          >
-            <LogOut className="h-4 w-4" />
-            <span>Logout</span>
-          </button>
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
             <input
@@ -342,13 +328,13 @@ const Packages: React.FC = () => {
             <div className="mb-4">
               <h4 className="text-sm font-medium text-gray-900 mb-2">Features:</h4>
               <ul className="space-y-1">
-                {pkg.features.slice(0, 3).map((feature, index) => (
+                {(Array.isArray(pkg.features) ? pkg.features : []).slice(0, 3).map((feature, index) => (
                   <li key={index} className="text-xs text-gray-600 flex items-start">
                     <CheckCircle className="h-3 w-3 mr-1 mt-0.5 text-green-500 flex-shrink-0" />
                     {feature}
                   </li>
                 ))}
-                {pkg.features.length > 3 && (
+                {Array.isArray(pkg.features) && pkg.features.length > 3 && (
                   <li className="text-xs text-gray-500">+{pkg.features.length - 3} more</li>
                 )}
               </ul>

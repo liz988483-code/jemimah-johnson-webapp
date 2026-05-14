@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { Search, Eye, Edit, Trash2, Calendar, Building2, LogOut, Plus, FileText } from 'lucide-react'
+import { Search, Eye, Edit, Trash2, Calendar, Building2, Plus, FileText } from 'lucide-react'
 
 interface Inquiry {
   id: number
@@ -50,7 +49,6 @@ interface Pagination {
 }
 
 const Inquiries: React.FC = () => {
-  const navigate = useNavigate()
   const [inquiries, setInquiries] = useState<Inquiry[]>([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
@@ -66,12 +64,6 @@ const Inquiries: React.FC = () => {
   const [showRegistrationModal, setShowRegistrationModal] = useState(false)
   const [selectedRegistration, setSelectedRegistration] = useState<Registration | null>(null)
   const [registrationForm, setRegistrationForm] = useState<Partial<Registration>>({})
-
-  const handleLogout = () => {
-    localStorage.removeItem('adminToken')
-    localStorage.removeItem('adminUser')
-    navigate('/admin/login')
-  }
 
   useEffect(() => {
     fetchInquiries()
@@ -249,13 +241,6 @@ const Inquiries: React.FC = () => {
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold text-gray-900">Inquiries</h1>
         <div className="flex items-center space-x-4">
-          <button
-            onClick={handleLogout}
-            className="flex items-center space-x-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
-          >
-            <LogOut className="h-4 w-4" />
-            <span>Logout</span>
-          </button>
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
             <input

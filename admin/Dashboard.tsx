@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts'
-import { Users, FileText, TrendingUp, Calendar, Phone, Building2, DollarSign, LogOut } from 'lucide-react'
+import { Users, FileText, TrendingUp, Calendar, Phone, Building2, DollarSign } from 'lucide-react'
 
 interface DashboardStats {
   totalInquiries: number
@@ -23,12 +23,6 @@ const Dashboard: React.FC = () => {
     clientsByStatus: {}
   })
   const [loading, setLoading] = useState(true)
-
-  const handleLogout = () => {
-    localStorage.removeItem('adminToken')
-    localStorage.removeItem('adminUser')
-    navigate('/admin/login')
-  }
 
   useEffect(() => {
     fetchStats()
@@ -90,13 +84,6 @@ const Dashboard: React.FC = () => {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
-        <button
-          onClick={handleLogout}
-          className="flex items-center space-x-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
-        >
-          <LogOut className="h-4 w-4" />
-          <span>Logout</span>
-        </button>
       </div>
       <div className="flex items-center space-x-2 text-sm text-gray-500">
         <Calendar className="h-4 w-4" />
@@ -199,28 +186,24 @@ const Dashboard: React.FC = () => {
       <div className="bg-white rounded-lg shadow p-6">
         <h3 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <button className="flex items-center justify-center space-x-2 px-4 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors">
+          <button
+            onClick={() => navigate('/admin/inquiries')}
+            className="flex items-center justify-center space-x-2 px-4 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors">
             <Phone className="h-5 w-5" />
             <span>View Inquiries</span>
           </button>
-          <button 
-  onClick={() => navigate('/admin/inquiries')}
-  className="flex items-center justify-center space-x-2 px-4 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors">
-  <Phone className="h-5 w-5" />
-  <span>View Inquiries</span>
-</button>
-<button 
-  onClick={() => navigate('/admin/clients')}
-  className="flex items-center justify-center space-x-2 px-4 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
-  <Users className="h-5 w-5" />
-  <span>Manage Clients</span>
-</button>
-<button 
-  onClick={() => navigate('/admin/packages')}
-  className="flex items-center justify-center space-x-2 px-4 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors">
-  <DollarSign className="h-5 w-5" />
-  <span>View Packages</span>
-</button>
+          <button
+            onClick={() => navigate('/admin/clients')}
+            className="flex items-center justify-center space-x-2 px-4 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
+            <Users className="h-5 w-5" />
+            <span>Manage Clients</span>
+          </button>
+          <button
+            onClick={() => navigate('/admin/packages')}
+            className="flex items-center justify-center space-x-2 px-4 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors">
+            <DollarSign className="h-5 w-5" />
+            <span>View Packages</span>
+          </button>
         </div>
       </div>
     </div>

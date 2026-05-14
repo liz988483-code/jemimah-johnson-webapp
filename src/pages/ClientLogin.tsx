@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Mail, Lock, ArrowRight } from 'lucide-react'
+import { Mail, Lock, ArrowRight, Eye, EyeOff } from 'lucide-react'
 
 const ClientLogin: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -9,6 +9,7 @@ const ClientLogin: React.FC = () => {
   })
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value })
@@ -16,33 +17,42 @@ const ClientLogin: React.FC = () => {
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
-    console.log('ClientLogin - handleSubmit called')
     e.preventDefault()
-    console.log('ClientLogin - Form prevented default')
     setLoading(true)
     setError('')
-    console.log('ClientLogin - Starting API call')
 
     try {
-      const response = await fetch('/api/client/login', {
+      // Try client login first
+      const clientRes = await fetch('/api/client/login', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)
       })
+      const clientData = await clientRes.json()
 
-      const data = await response.json()
-
-      if (data.success) {
-        localStorage.setItem('clientToken', data.data.token)
-        localStorage.setItem('clientUser', JSON.stringify(data.data.user))
-        console.log('Login successful, navigating to dashboard')
-        console.log('Token stored:', localStorage.getItem('clientToken'))
+      if (clientData.success) {
+        localStorage.setItem('clientToken', clientData.data.token)
+        localStorage.setItem('clientUser', JSON.stringify(clientData.data.user))
         window.location.href = '/dashboard'
-      } else {
-        setError(data.message || 'Login failed')
+        return
       }
+
+      // Fall back to admin login
+      const adminRes = await fetch('/api/admin/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData)
+      })
+      const adminData = await adminRes.json()
+
+      if (adminData.success) {
+        localStorage.setItem('adminToken', adminData.token)
+        localStorage.setItem('adminUser', JSON.stringify(adminData.user))
+        window.location.href = '/admin/dashboard'
+        return
+      }
+
+      setError('Invalid email or password')
     } catch (error) {
       setError('An error occurred. Please try again.')
     } finally {
@@ -101,13 +111,21 @@ const ClientLogin: React.FC = () => {
                   <input
                     id="password"
                     name="password"
-                    type="password"
+                    type={showPassword ? 'text' : 'password'}
                     required
-                    className="appearance-none relative block w-full pl-10 pr-3 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-lg focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
+                    className="appearance-none relative block w-full pl-10 pr-12 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-lg focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
                     placeholder="Enter your password"
                     value={formData.password}
                     onChange={handleChange}
                   />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 transition"
+                    aria-label={showPassword ? 'Hide password' : 'Show password'}
+                  >
+                    {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                  </button>
                 </div>
               </div>
             </div>

@@ -9,8 +9,9 @@
     "dev:backend": "cd backend && nodemon --exec \"ts-node --project tsconfig.json\" server.ts",
     "backend": "cd backend && nodemon --exec \"ts-node --project tsconfig.json\" server.ts",
     "build": "vite build",
+    "build:backend": "cd backend && tsc",
     "preview": "vite preview",
-    "start": "node backend/server.js",
+    "start": "node backend/dist/server.js",
     "lint": "eslint src --ext .ts,.tsx",
     "type-check": "tsc --noEmit"
   },
@@ -31,7 +32,6 @@
     "multer": "^2.1.1",
     "mysql2": "^3.6.0",
     "nodemailer": "^6.9.0",
-    "pg": "^8.20.0",
     "postcss": "^8.4.21",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
@@ -59,6 +59,7 @@
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.3.4",
     "nodemon": "^2.0.20",
+    "sequelize-cli": "^6.6.5",
     "ts-node": "^10.9.2",
     "typescript": "^4.9.3",
     "vite": "^4.1.0"

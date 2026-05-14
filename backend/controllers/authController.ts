@@ -18,7 +18,7 @@ export const adminLogin = async (req: Request, res: Response) => {
 
     // Generate JWT token
     const token = jwt.sign(
-      { id: 'admin', email: adminEmail },
+      { id: 'admin', email: adminEmail, role: 'admin' },
       process.env.JWT_SECRET || 'your-super-secret-jwt-key-change-in-production',
       { expiresIn: process.env.JWT_EXPIRE || '30d' } as jwt.SignOptions
     )

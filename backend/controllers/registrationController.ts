@@ -1,6 +1,14 @@
 import { Request, Response } from 'express'
 import ServicePackage from '../models/ServicePackage'
 
+// Normalize package JSON fields to ensure arrays
+const normalizePackage = (pkg: any) => {
+  const plain = pkg.get ? pkg.get({ plain: true }) : pkg
+  if (!Array.isArray(plain.features)) plain.features = []
+  if (!Array.isArray(plain.inclusions)) plain.inclusions = []
+  return plain
+}
+
 // Get all service packages
 export const getPackages = async (req: Request, res: Response) => {
   try {
@@ -23,7 +31,7 @@ export const getPackages = async (req: Request, res: Response) => {
     
     res.json({
       success: true,
-      data: packages
+      data: packages.map(normalizePackage)
     })
   } catch (error: any) {
     console.error('Error fetching packages:', error)
@@ -56,7 +64,7 @@ export const getPackagesByType = async (req: Request, res: Response) => {
     
     res.json({
       success: true,
-      data: packages
+      data: packages.map(normalizePackage)
     })
   } catch (error: any) {
     console.error('Error fetching packages by type:', error)
@@ -81,7 +89,7 @@ export const getPackageById = async (req: Request, res: Response) => {
     
     res.json({
       success: true,
-      data: packageItem
+      data: normalizePackage(packageItem)
     })
   } catch (error: any) {
     console.error('Error fetching package:', error)

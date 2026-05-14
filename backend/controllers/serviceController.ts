@@ -140,9 +140,18 @@ export const getClients = async (req: Request, res: Response) => {
     
     const total = await Client.count({ where: whereClause })
     
+    // Normalize services to always be an array
+    const normalizedClients = clients.map((client: any) => {
+      const plain = client.get({ plain: true })
+      if (!Array.isArray(plain.services)) {
+        plain.services = []
+      }
+      return plain
+    })
+    
     res.json({
       success: true,
-      data: clients,
+      data: normalizedClients,
       pagination: {
         page: Number(page),
         limit: Number(limit),

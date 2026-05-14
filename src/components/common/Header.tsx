@@ -134,12 +134,7 @@ const Header: React.FC<HeaderProps> = ({ isMenuOpen, toggleMenu }) => {
                   </Link>
                 </>
               )}
-              <Link
-                to="/contact"
-                className="btn-primary text-sm px-4 py-2"
-              >
-                Get Quote
-              </Link>
+
             </div>
 
             <button

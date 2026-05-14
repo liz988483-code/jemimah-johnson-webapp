@@ -1,6 +1,7 @@
 import { Router } from 'express'
 import { body } from 'express-validator'
 import { 
+  getPackages,
   createPackage, 
   updatePackage, 
   deletePackage, 
@@ -39,6 +40,8 @@ router.delete('/inquiries/:id', deleteInquiry)
 router.use('/registrations', registrationRoutes)
 
 // Package management routes (admin only)
+router.get('/packages', getPackages)
+
 router.post('/packages', [
   body('name').notEmpty().withMessage('Package name is required'),
   body('type').isIn(['company', 'sole-proprietorship']).withMessage('Valid package type is required'),

@@ -16,7 +16,7 @@ import { errorHandler, notFound } from './middleware/errorHandler'
 dotenv.config()
 
 const app = express()
-const PORT = 5000
+const PORT = process.env.PORT || 5001
 
 // Connect to MySQL
 sequelize.authenticate()
@@ -35,7 +35,7 @@ sequelize.authenticate()
 // Middleware
 app.use(helmet())
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:3002',
+  origin: process.env.FRONTEND_URL || 'http://localhost:3001', // ✅ FIXED: Changed from 3002 to 3001
   credentials: true
 }))
 app.use(morgan('combined'))
