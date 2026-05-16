@@ -40,12 +40,43 @@ const CompanyRegistration: React.FC = () => {
     setForm({ ...form, [e.target.name]: e.target.value })
   }
 
+  // --- MPESA INTEGRATION FUNCTION ---
+  const triggerMpesaPush = async (phone: string, amount: number) => {
+    try {
+      // Formats 07... to 2547...
+      const formattedPhone = phone.startsWith('0') ? '254' + phone.substring(1) : phone;
+      
+      const response = await fetch('http://localhost:5001/api/mpesa/stk-push', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          phone: formattedPhone,
+          amount: amount
+        })
+      });
+
+      const data = await response.json();
+      return data.ResponseCode === "0"; // "0" means Safaricom accepted the request
+    } catch (err) {
+      console.error("Mpesa Error:", err);
+      return false;
+    }
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
     setError('')
 
     try {
+      // 1. TRIGGER MPESA STK PUSH FIRST
+      const mpesaInitiated = await triggerMpesaPush(form.phone, selectedPkg.price);
+
+      if (!mpesaInitiated) {
+        throw new Error("Failed to initiate M-Pesa payment. Please check your number and try again.");
+      }
+
+      // 2. SUBMIT DATA TO YOUR BACKEND
       const response = await fetch('http://localhost:5001/api/inquiry', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -54,7 +85,8 @@ const CompanyRegistration: React.FC = () => {
           entityType: selectedType === 'company' ? 'company' : 'sole-proprietorship',
           packageId: selectedPkg?.id,
           packageName: selectedPkg?.name,
-          packageTier: selectedPkg?.name?.toLowerCase(), // adds 'basic', 'standard', or 'premium'
+          packageTier: selectedPkg?.name?.toLowerCase(),
+          paymentStatus: 'Pending' // Mark as pending until callback verifies it
         })
       })
 
@@ -65,8 +97,8 @@ const CompanyRegistration: React.FC = () => {
       } else {
         setError(data.message || 'Something went wrong. Please try again.')
       }
-    } catch (err) {
-      setError('Could not connect to server. Make sure the backend is running.')
+    } catch (err: any) {
+      setError(err.message || 'Could not connect to server.');
     } finally {
       setLoading(false)
     }
@@ -146,138 +178,86 @@ const CompanyRegistration: React.FC = () => {
           })}
         </div>
 
-        {/* Process Overview */}
-        <div className="bg-gradient-to-r from-primary-50 to-secondary-50 rounded-2xl p-8">
-          <h3 className="text-2xl font-bold text-secondary-900 mb-6 text-center">Registration Process</h3>
-          <div className="grid md:grid-cols-4 gap-6">
-            {[
-              { step: 1, title: 'Consultation', description: 'Discuss your requirements and choose the right package' },
-              { step: 2, title: 'Document Collection', description: 'Gather all necessary documents and information' },
-              { step: 3, title: 'Registration', description: 'Submit applications to relevant authorities' },
-              { step: 4, title: 'Completion', description: 'Receive your registration documents' }
-            ].map((item) => (
-              <div key={item.step} className="text-center">
-                <div className="w-12 h-12 bg-primary-600 text-white rounded-full flex items-center justify-center mx-auto mb-4 text-lg font-bold">{item.step}</div>
-                <h4 className="font-semibold text-secondary-900 mb-2">{item.title}</h4>
-                <p className="text-sm text-secondary-600">{item.description}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* Modal */}
-      {showModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
-            
-            {/* Modal Header */}
-            <div className="bg-primary-600 text-white p-6 rounded-t-2xl flex justify-between items-start">
-              <div>
-                <h2 className="text-xl font-bold">Get Started</h2>
-                <p className="text-primary-100 text-sm mt-1">
-                  {selectedPkg?.name} — KES {selectedPkg?.price?.toLocaleString()}
-                </p>
-              </div>
-              <button onClick={handleClose} className="text-white hover:text-primary-200">
-                <X className="h-6 w-6" />
-              </button>
-            </div>
-
-            <div className="p-6">
-              {success ? (
-                <div className="text-center py-8">
-                  <CheckCircle className="h-16 w-16 text-green-500 mx-auto mb-4" />
-                  <h3 className="text-xl font-bold text-secondary-900 mb-2">Inquiry Submitted!</h3>
-                  <p className="text-secondary-600 mb-6">
-                    Thank you! Our team will contact you within 24 hours.
+        {/* Modal */}
+        {showModal && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
+              
+              <div className="bg-primary-600 text-white p-6 rounded-t-2xl flex justify-between items-start">
+                <div>
+                  <h2 className="text-xl font-bold">Complete Registration</h2>
+                  <p className="text-primary-100 text-sm mt-1">
+                    {selectedPkg?.name} — KES {selectedPkg?.price?.toLocaleString()}
                   </p>
-                  <Button onClick={handleClose}>Close</Button>
                 </div>
-              ) : (
-                <form onSubmit={handleSubmit} className="space-y-4">
-                  {error && (
-                    <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
-                      {error}
-                    </div>
-                  )}
+                <button onClick={handleClose} className="text-white hover:text-primary-200">
+                  <X className="h-6 w-6" />
+                </button>
+              </div>
 
-                  <div className="grid grid-cols-2 gap-4">
+              <div className="p-6">
+                {success ? (
+                  <div className="text-center py-8">
+                    <CheckCircle className="h-16 w-16 text-green-500 mx-auto mb-4" />
+                    <h3 className="text-xl font-bold text-secondary-900 mb-2">Payment Initiated!</h3>
+                    <p className="text-secondary-600 mb-6">
+                      Please check your phone for the M-Pesa PIN prompt to complete your registration.
+                    </p>
+                    <Button onClick={handleClose}>Close</Button>
+                  </div>
+                ) : (
+                  <form onSubmit={handleSubmit} className="space-y-4">
+                    {error && (
+                      <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
+                        {error}
+                      </div>
+                    )}
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-secondary-700 mb-1">Full Name *</label>
+                        <input
+                          name="name" value={form.name} onChange={handleChange} required
+                          placeholder="Jane Doe"
+                          className="w-full border border-secondary-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary-500"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-secondary-700 mb-1">M-Pesa Phone *</label>
+                        <input
+                          name="phone" value={form.phone} onChange={handleChange} required
+                          placeholder="0742 663 826"
+                          className="w-full border border-secondary-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary-500"
+                        />
+                      </div>
+                    </div>
+
                     <div>
-                      <label className="block text-sm font-medium text-secondary-700 mb-1">Full Name *</label>
+                      <label className="block text-sm font-medium text-secondary-700 mb-1">Email Address *</label>
                       <input
-                        name="name" value={form.name} onChange={handleChange} required
-                        placeholder="Jane Doe"
-                        className="w-full border border-secondary-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+                        name="email" value={form.email} onChange={handleChange} required type="email"
+                        className="w-full border border-secondary-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary-500"
                       />
                     </div>
+
                     <div>
-                      <label className="block text-sm font-medium text-secondary-700 mb-1">Phone *</label>
+                      <label className="block text-sm font-medium text-secondary-700 mb-1">Proposed Business Name *</label>
                       <input
-                        name="phone" value={form.phone} onChange={handleChange} required
-                        placeholder="0712 345 678"
-                        className="w-full border border-secondary-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+                        name="proposedName" value={form.proposedName} onChange={handleChange} required
+                        className="w-full border border-secondary-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary-500"
                       />
                     </div>
-                  </div>
 
-                  <div>
-                    <label className="block text-sm font-medium text-secondary-700 mb-1">Email Address *</label>
-                    <input
-                      name="email" value={form.email} onChange={handleChange} required type="email"
-                      placeholder="jane@email.com"
-                      className="w-full border border-secondary-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-secondary-700 mb-1">Proposed Business Name *</label>
-                    <input
-                      name="proposedName" value={form.proposedName} onChange={handleChange} required
-                      placeholder="e.g. Sunrise Ventures Ltd"
-                      className="w-full border border-secondary-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-secondary-700 mb-1">Business Description *</label>
-                    <textarea
-                      name="businessDescription" value={form.businessDescription} onChange={handleChange} required
-                      rows={3} placeholder="Briefly describe what your business does..."
-                      className="w-full border border-secondary-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 resize-none"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-secondary-700 mb-1">Urgency</label>
-                    <select
-                      name="urgency" value={form.urgency} onChange={handleChange}
-                      className="w-full border border-secondary-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
-                    >
-                      <option value="low">Low — within a week</option>
-                      <option value="medium">Medium — within 3 days</option>
-                      <option value="high">High — as soon as possible</option>
-                    </select>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-secondary-700 mb-1">Additional Info</label>
-                    <textarea
-                      name="additionalInfo" value={form.additionalInfo} onChange={handleChange}
-                      rows={2} placeholder="Any other details we should know..."
-                      className="w-full border border-secondary-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 resize-none"
-                    />
-                  </div>
-
-                  <Button type="submit" className="w-full" disabled={loading}>
-                    {loading ? 'Submitting...' : 'Submit Inquiry'}
-                  </Button>
-                </form>
-              )}
+                    <Button type="submit" className="w-full" disabled={loading}>
+                      {loading ? 'Processing Payment...' : `Pay KES ${selectedPkg?.price?.toLocaleString()}`}
+                    </Button>
+                  </form>
+                )}
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   )
 }
