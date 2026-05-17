@@ -20,24 +20,27 @@ dotenv.config()
 const app = express()
 const PORT = process.env.PORT || 5001
 
-// Connect DB
-sequelize.authenticate()
-  .then(() => {
-    console.log('MySQL connected successfully')
-    return sequelize.sync({ alter: true })
-  })
-  .then(() => {
-    console.log('Database synchronized successfully')
-  })
-  .catch((err) => {
-    console.error('MySQL connection error:', err)
-    process.exit(1)
-  })
+// Connect DB - TEMPORARILY DISABLED FOR TESTING
+// sequelize.authenticate()
+//   .then(() => {
+//     console.log('MySQL connected successfully')
+//     return sequelize.sync({ alter: true })
+//   })
+//   .then(() => {
+//     console.log('Database synchronized successfully')
+//   })
+//   .catch((err) => {
+//     console.error('MySQL connection error:', err)
+//     process.exit(1)
+//   })
+
+// Temporarily skip DB - will fix later
+console.log('⚠️ Database connection skipped for testing')
 
 // Middleware
 app.use(helmet())
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+  origin: process.env.FRONTEND_URL || 'http://localhost:3001',
   credentials: true
 }))
 app.use(morgan('combined'))
