@@ -192,3 +192,85 @@ export const updateClientProfile = async (req: Request, res: Response) => {
     })
   }
 }
+
+// Update the registration profile information supplied by the client
+export const updateClientInquiryProfile = async (req: Request, res: Response) => {
+  try {
+    const userId = (req as any).user?.id
+    const inquiryId = req.params.id
+    const {
+      applicantIdNumber,
+      applicantKraPin,
+      physicalAddress,
+      postalAddress,
+      directors,
+      shareholders,
+      requiredDocuments,
+      notes
+    } = req.body
+
+    const user = await ClientUser.findByPk(userId)
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found'
+      })
+    }
+
+    const inquiry = await Inquiry.findOne({
+      where: {
+        id: inquiryId,
+        email: user.email
+      }
+    })
+
+    if (!inquiry) {
+      return res.status(404).json({
+        success: false,
+        message: 'Inquiry not found'
+      })
+    }
+
+    let existingAdditionalInfo: any = {}
+    if (inquiry.additionalInfo) {
+      try {
+        existingAdditionalInfo = JSON.parse(inquiry.additionalInfo)
+      } catch {
+        existingAdditionalInfo = { notes: inquiry.additionalInfo }
+      }
+    }
+
+    const clientProfile = {
+      applicantIdNumber,
+      applicantKraPin,
+      physicalAddress,
+      postalAddress,
+      directors,
+      shareholders,
+      requiredDocuments,
+      notes,
+      updatedAt: new Date().toISOString()
+    }
+
+    await inquiry.update({
+      additionalInfo: JSON.stringify({
+        ...existingAdditionalInfo,
+        clientProfile
+      })
+    })
+
+    res.json({
+      success: true,
+      message: 'Registration profile updated successfully',
+      data: {
+        inquiry
+      }
+    })
+  } catch (error: any) {
+    console.error('Error updating client inquiry profile:', error)
+    res.status(400).json({
+      success: false,
+      message: error.message || 'Failed to update registration profile'
+    })
+  }
+}

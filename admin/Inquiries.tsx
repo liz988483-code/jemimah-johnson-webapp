@@ -48,6 +48,27 @@ interface Pagination {
   pages: number
 }
 
+const parseClientProfile = (additionalInfo?: string) => {
+  if (!additionalInfo) return null
+
+  try {
+    return JSON.parse(additionalInfo)?.clientProfile || null
+  } catch {
+    return null
+  }
+}
+
+const getPlainAdditionalInfo = (additionalInfo?: string) => {
+  if (!additionalInfo) return ''
+
+  try {
+    const parsed = JSON.parse(additionalInfo)
+    return parsed.notes && !parsed.clientProfile ? parsed.notes : ''
+  } catch {
+    return additionalInfo
+  }
+}
+
 const Inquiries: React.FC = () => {
   const [inquiries, setInquiries] = useState<Inquiry[]>([])
   const [loading, setLoading] = useState(true)
@@ -64,6 +85,7 @@ const Inquiries: React.FC = () => {
   const [showRegistrationModal, setShowRegistrationModal] = useState(false)
   const [selectedRegistration, setSelectedRegistration] = useState<Registration | null>(null)
   const [registrationForm, setRegistrationForm] = useState<Partial<Registration>>({})
+  const [registrationLoading, setRegistrationLoading] = useState(false)
 
   useEffect(() => {
     fetchInquiries()
@@ -93,6 +115,7 @@ const Inquiries: React.FC = () => {
       }
     } catch (error) {
       console.error('Error fetching inquiries:', error)
+      alert('Error fetching inquiries. Please try again.')
     } finally {
       setLoading(false)
     }
@@ -118,6 +141,7 @@ const Inquiries: React.FC = () => {
       }
     } catch (error) {
       console.error('Error updating status:', error)
+      alert('Error updating status. Please try again.')
     }
   }
 
@@ -133,18 +157,28 @@ const Inquiries: React.FC = () => {
         })
 
         if (response.ok) {
+          alert('Inquiry deleted successfully!')
           fetchInquiries()
           setShowModal(false)
           setSelectedInquiry(null)
+        } else {
+          alert('Error deleting inquiry')
         }
       } catch (error) {
         console.error('Error deleting inquiry:', error)
+        alert('Error deleting inquiry. Please try again.')
       }
     }
   }
 
   const createRegistration = async (inquiryId: number) => {
+    if (!inquiryId) {
+      alert('Error: Inquiry ID not found. Please try again.')
+      return
+    }
+
     try {
+      setRegistrationLoading(true)
       const token = localStorage.getItem('adminToken')
       const response = await fetch('/api/admin/registrations', {
         method: 'POST',
@@ -157,18 +191,30 @@ const Inquiries: React.FC = () => {
 
       const data = await response.json()
       if (data.success) {
+        alert('Registration created successfully!')
         fetchInquiries()
         setSelectedRegistration(data.data)
         setRegistrationForm(data.data)
         setShowRegistrationModal(true)
+      } else {
+        alert(`Error creating registration: ${data.message || 'Unknown error'}`)
       }
     } catch (error) {
       console.error('Error creating registration:', error)
+      alert('Error creating registration. Please try again.')
+    } finally {
+      setRegistrationLoading(false)
     }
   }
 
   const fetchRegistration = async (inquiryId: number) => {
+    if (!inquiryId) {
+      alert('Error: Inquiry ID not found.')
+      return
+    }
+
     try {
+      setRegistrationLoading(true)
       const token = localStorage.getItem('adminToken')
       const response = await fetch(`/api/admin/registrations/inquiry/${inquiryId}`, {
         headers: {
@@ -180,16 +226,27 @@ const Inquiries: React.FC = () => {
         setSelectedRegistration(data.data)
         setRegistrationForm(data.data)
         setShowRegistrationModal(true)
+      } else {
+        alert('Registration not found')
       }
     } catch (error) {
       console.error('Error fetching registration:', error)
+      alert('Error fetching registration. Please try again.')
+    } finally {
+      setRegistrationLoading(false)
     }
   }
 
   const updateRegistration = async () => {
+    if (!selectedRegistration || !selectedRegistration.id) {
+      alert('Error: Registration ID not found.')
+      return
+    }
+
     try {
+      setRegistrationLoading(true)
       const token = localStorage.getItem('adminToken')
-      const response = await fetch(`/api/admin/registrations/${selectedRegistration?.id}`, {
+      const response = await fetch(`/api/admin/registrations/${selectedRegistration.id}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -199,13 +256,20 @@ const Inquiries: React.FC = () => {
       })
 
       if (response.ok) {
+        alert('Registration updated successfully!')
         fetchInquiries()
         setShowRegistrationModal(false)
         setSelectedRegistration(null)
         setRegistrationForm({})
+      } else {
+        const errorData = await response.json()
+        alert(`Error updating registration: ${errorData.message || 'Unknown error'}`)
       }
     } catch (error) {
       console.error('Error updating registration:', error)
+      alert('Error updating registration. Please try again.')
+    } finally {
+      setRegistrationLoading(false)
     }
   }
 
@@ -330,7 +394,8 @@ const Inquiries: React.FC = () => {
                     {inquiry.registrationId ? (
                       <button
                         onClick={() => fetchRegistration(inquiry.id)}
-                        className="text-green-600 hover:text-green-900 font-medium text-sm flex items-center"
+                        disabled={registrationLoading}
+                        className="text-green-600 hover:text-green-900 font-medium text-sm flex items-center disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         <FileText className="h-4 w-4 mr-1" />
                         View
@@ -338,11 +403,11 @@ const Inquiries: React.FC = () => {
                     ) : (
                       <button
                         onClick={() => createRegistration(inquiry.id)}
-                        className="text-primary-600 hover:text-primary-900 font-medium text-sm flex items-center"
-                        disabled={inquiry.status === 'pending'}
+                        disabled={registrationLoading}
+                        className="text-primary-600 hover:text-primary-900 font-medium text-sm flex items-center disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         <Plus className="h-4 w-4 mr-1" />
-                        Create
+                        {registrationLoading ? 'Creating...' : 'Create'}
                       </button>
                     )}
                   </td>
@@ -360,18 +425,21 @@ const Inquiries: React.FC = () => {
                           setShowModal(true)
                         }}
                         className="text-primary-600 hover:text-primary-900"
+                        title="View details"
                       >
                         <Eye className="h-4 w-4" />
                       </button>
                       <button
                         onClick={() => updateStatus(inquiry.id, 'contacted')}
                         className="text-blue-600 hover:text-blue-900"
+                        title="Mark as contacted"
                       >
                         <Edit className="h-4 w-4" />
                       </button>
                       <button
                         onClick={() => deleteInquiry(inquiry.id)}
                         className="text-red-600 hover:text-red-900"
+                        title="Delete inquiry"
                       >
                         <Trash2 className="h-4 w-4" />
                       </button>
@@ -483,7 +551,7 @@ const Inquiries: React.FC = () => {
                       <div>
                         <label className="block text-sm font-medium text-gray-700">Status</label>
                         <select
-                          className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm rounded-md"
+                          className="mt-1 block w-full pl-3 pr-10 py-2 text-base border border-gray-300 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm rounded-md"
                           value={selectedInquiry.status}
                           onChange={(e) => updateStatus(selectedInquiry.id, e.target.value)}
                         >
@@ -493,10 +561,27 @@ const Inquiries: React.FC = () => {
                           <option value="completed">Completed</option>
                         </select>
                       </div>
-                      {selectedInquiry.additionalInfo && (
+                      {getPlainAdditionalInfo(selectedInquiry.additionalInfo) && (
                         <div>
                           <label className="block text-sm font-medium text-gray-700">Additional Information</label>
-                          <p className="mt-1 text-sm text-gray-900">{selectedInquiry.additionalInfo}</p>
+                          <p className="mt-1 text-sm text-gray-900">{getPlainAdditionalInfo(selectedInquiry.additionalInfo)}</p>
+                        </div>
+                      )}
+                      {parseClientProfile(selectedInquiry.additionalInfo) && (
+                        <div className="rounded-lg border border-primary-100 bg-primary-50 p-4">
+                          <label className="block text-sm font-semibold text-primary-900 mb-3">Client Registration Profile</label>
+                          <div className="grid grid-cols-1 gap-3 text-sm">
+                            {Object.entries(parseClientProfile(selectedInquiry.additionalInfo) || {}).map(([key, value]) => (
+                              key !== 'updatedAt' && value ? (
+                                <div key={key}>
+                                  <span className="font-medium text-primary-800">
+                                    {key.replace(/([A-Z])/g, ' $1').replace(/^./, (char) => char.toUpperCase())}:
+                                  </span>
+                                  <p className="mt-1 whitespace-pre-wrap text-primary-900">{String(value)}</p>
+                                </div>
+                              ) : null
+                            ))}
+                          </div>
                         </div>
                       )}
                       <div>
@@ -543,7 +628,7 @@ const Inquiries: React.FC = () => {
                       <div>
                         <label className="block text-sm font-medium text-gray-700">Business Type</label>
                         <select
-                          className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm rounded-md"
+                          className="mt-1 block w-full pl-3 pr-10 py-2 text-base border border-gray-300 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm rounded-md"
                           value={registrationForm.business_type || ''}
                           onChange={(e) => setRegistrationForm({ ...registrationForm, business_type: e.target.value as any })}
                         >
@@ -555,7 +640,7 @@ const Inquiries: React.FC = () => {
                       <div>
                         <label className="block text-sm font-medium text-gray-700">Package Tier</label>
                         <select
-                          className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm rounded-md"
+                          className="mt-1 block w-full pl-3 pr-10 py-2 text-base border border-gray-300 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm rounded-md"
                           value={registrationForm.package_tier || ''}
                           onChange={(e) => setRegistrationForm({ ...registrationForm, package_tier: e.target.value as any })}
                         >
@@ -658,7 +743,7 @@ const Inquiries: React.FC = () => {
                       <div>
                         <label className="block text-sm font-medium text-gray-700">Overall Status</label>
                         <select
-                          className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm rounded-md"
+                          className="mt-1 block w-full pl-3 pr-10 py-2 text-base border border-gray-300 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm rounded-md"
                           value={registrationForm.overall_status || ''}
                           onChange={(e) => setRegistrationForm({ ...registrationForm, overall_status: e.target.value as any })}
                         >
@@ -672,7 +757,7 @@ const Inquiries: React.FC = () => {
                       <div>
                         <label className="block text-sm font-medium text-gray-700">Payment Status</label>
                         <select
-                          className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm rounded-md"
+                          className="mt-1 block w-full pl-3 pr-10 py-2 text-base border border-gray-300 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm rounded-md"
                           value={registrationForm.payment_status || ''}
                           onChange={(e) => setRegistrationForm({ ...registrationForm, payment_status: e.target.value as any })}
                         >
@@ -698,14 +783,16 @@ const Inquiries: React.FC = () => {
               <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
                 <button
                   type="button"
-                  className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-primary-600 text-base font-medium text-white hover:bg-primary-700 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm"
+                  disabled={registrationLoading}
+                  className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-primary-600 text-base font-medium text-white hover:bg-primary-700 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed"
                   onClick={updateRegistration}
                 >
-                  Save Changes
+                  {registrationLoading ? 'Saving...' : 'Save Changes'}
                 </button>
                 <button
                   type="button"
-                  className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
+                  disabled={registrationLoading}
+                  className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm disabled:opacity-50"
                   onClick={() => setShowRegistrationModal(false)}
                 >
                   Cancel

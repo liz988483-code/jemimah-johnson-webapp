@@ -1,8 +1,40 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
-import { ArrowRight, CheckCircle, Phone } from 'lucide-react'
+import { motion } from 'framer-motion'
+import { ArrowRight, BarChart3, Briefcase, Building2, CheckCircle, FileText, Phone, Sparkles } from 'lucide-react'
 import { APP_CONFIG } from '@/utils/constants'
 import Button from '@/components/common/Button'
+
+const coreServices = [
+  {
+    title: 'Company Registration',
+    description: 'Fast business setup with clear filing support.',
+    icon: Building2,
+    accent: 'bg-primary-500',
+    surface: 'bg-white',
+  },
+  {
+    title: 'Accounting & Bookkeeping',
+    description: 'Clean records and dependable financial reporting.',
+    icon: BarChart3,
+    accent: 'bg-secondary-700',
+    surface: 'bg-white',
+  },
+  {
+    title: 'Tax Services',
+    description: 'Planning, filing, and compliance without the stress.',
+    icon: FileText,
+    accent: 'bg-accent-500',
+    surface: 'bg-white',
+  },
+  {
+    title: 'Business Advisory',
+    description: 'Practical guidance for sharper business decisions.',
+    icon: Briefcase,
+    accent: 'bg-primary-700',
+    surface: 'bg-white',
+  },
+]
 
 const HeroSection: React.FC = () => {
   return (
@@ -70,27 +102,69 @@ const HeroSection: React.FC = () => {
 
             {/* Right Content - Services Preview */}
             <div className="hidden lg:block">
-              <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl p-8 border border-secondary-100">
-                <h3 className="text-2xl font-bold text-secondary-900 mb-6">Our Core Services</h3>
-                <div className="space-y-4">
-                  <div className="p-4 bg-primary-50 rounded-lg border border-primary-100">
-                    <h4 className="font-semibold text-primary-900 mb-2">Company Registration</h4>
-                    <p className="text-sm text-primary-700">Fast and efficient business registration services</p>
-                  </div>
-                  <div className="p-4 bg-secondary-50 rounded-lg border border-secondary-200">
-                    <h4 className="font-semibold text-secondary-900 mb-2">Accounting & Bookkeeping</h4>
-                    <p className="text-sm text-secondary-700">Professional financial management solutions</p>
-                  </div>
-                  <div className="p-4 bg-accent-50 rounded-lg border border-accent-100">
-                    <h4 className="font-semibold text-accent-900 mb-2">Tax Services</h4>
-                    <p className="text-sm text-accent-700">Comprehensive tax planning and compliance</p>
-                  </div>
-                  <div className="p-4 bg-primary-50 rounded-lg border border-primary-100">
-                    <h4 className="font-semibold text-primary-900 mb-2">Business Advisory</h4>
-                    <p className="text-sm text-primary-700">Strategic business consulting services</p>
+              <motion.div
+                initial={{ opacity: 0, y: 28 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.7, ease: 'easeOut' }}
+                className="relative"
+              >
+                <div className="mb-6 flex items-center justify-between">
+                  <div>
+                    <div className="mb-2 inline-flex items-center gap-2 rounded-full border border-primary-200 bg-white px-3 py-1 text-sm font-semibold text-primary-700 shadow-sm">
+                      <Sparkles className="h-4 w-4" />
+                      Core support
+                    </div>
+                    <h3 className="text-3xl font-bold text-secondary-900">Services That Move With You</h3>
                   </div>
                 </div>
-              </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  {coreServices.map((service, index) => {
+                    const Icon = service.icon
+
+                    return (
+                      <motion.div
+                        key={service.title}
+                        initial={{ opacity: 0, y: 24, scale: 0.96 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        transition={{ delay: index * 0.12, duration: 0.55, ease: 'easeOut' }}
+                        whileHover={{ y: -8, scale: 1.02 }}
+                        className={`${service.surface} group relative min-h-[178px] overflow-hidden rounded-lg border border-secondary-100 p-5 shadow-lg shadow-secondary-900/5 transition-colors hover:border-primary-200`}
+                      >
+                        <div className={`absolute left-0 top-0 h-full w-1.5 ${service.accent}`} />
+                        <div className="mb-5 flex items-center justify-between">
+                          <div className={`flex h-11 w-11 items-center justify-center rounded-lg ${service.accent} text-white shadow-md`}>
+                            <Icon className="h-5 w-5" />
+                          </div>
+                          <ArrowRight className="h-5 w-5 text-secondary-300 transition-transform group-hover:translate-x-1 group-hover:text-primary-500" />
+                        </div>
+                        <h4 className="mb-2 text-lg font-bold text-secondary-900">{service.title}</h4>
+                        <p className="text-sm leading-6 text-secondary-600">{service.description}</p>
+                      </motion.div>
+                    )
+                  })}
+                </div>
+
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.62, duration: 0.55, ease: 'easeOut' }}
+                  className="mt-5 grid grid-cols-3 gap-3 rounded-lg border border-secondary-100 bg-white p-4 shadow-lg shadow-secondary-900/5"
+                >
+                  <div>
+                    <p className="text-2xl font-bold text-primary-600">4+</p>
+                    <p className="text-xs font-medium text-secondary-500">Core services</p>
+                  </div>
+                  <div>
+                    <p className="text-2xl font-bold text-secondary-900">Fast</p>
+                    <p className="text-xs font-medium text-secondary-500">Turnaround</p>
+                  </div>
+                  <div>
+                    <p className="text-2xl font-bold text-accent-600">KES</p>
+                    <p className="text-xs font-medium text-secondary-500">Local expertise</p>
+                  </div>
+                </motion.div>
+              </motion.div>
             </div>
           </div>
         </div>

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { LogOut, FileText, Calendar, CheckCircle, Clock, AlertCircle, User, Plus } from 'lucide-react'
+import { LogOut, FileText, Calendar, CheckCircle, Clock, AlertCircle, User, Plus, UploadCloud } from 'lucide-react'
 
 interface Inquiry {
   id: number
@@ -8,6 +8,7 @@ interface Inquiry {
   email: string
   phone: string
   entityType: 'company' | 'sole-proprietorship'
+  packageTier: 'basic' | 'standard' | 'premium'
   proposedName: string
   businessDescription: string
   urgency: 'low' | 'medium' | 'high'
@@ -35,6 +36,117 @@ interface Registration {
   notes?: string
   createdAt: string
   updatedAt: string
+}
+
+interface ClientProfile {
+  applicantIdNumber?: string
+  applicantKraPin?: string
+  physicalAddress?: string
+  postalAddress?: string
+  directors?: string
+  shareholders?: string
+  requiredDocuments?: string
+  notes?: string
+}
+
+const companyDeliverables = {
+  basic: ['Incorporating Certificate', 'CR1, CR2, CR8, CR12', 'Statement of nominal capital'],
+  standard: ['Incorporating Certificate', 'CR1, CR2, CR8, CR12', 'Statement of nominal capital', 'Company KRA PIN', 'Tax Compliance Certificate', 'IFMIS Number Processing', 'AGPO Registration', 'Bank Account Opening Resolution Letter'],
+  premium: ['Incorporating Certificate', 'CR1, CR2, CR8, CR12', 'Statement of nominal capital', 'Company KRA PIN', 'Tax Compliance Certificate', 'IFMIS Number Processing', 'AGPO Registration', 'Bank Account Opening Resolution Letter', 'Logo Design', 'Letter Head Design', 'Business Card', 'Business Profile', 'Business Stamp', 'Business Seal', 'Business Social Media Accounts Opening'],
+}
+
+const soleDeliverables = {
+  basic: ['Business Registration Certificate'],
+  standard: ['Business Registration Certificate', 'AGPO Registration', 'IFMIS Registration'],
+  premium: ['Business Registration Certificates', 'AGPO Registration', 'IFMIS Registration', 'Logo Design', 'Letter Head Design', 'Business Card', 'Business Profile', 'Business Stamp', 'Business Seal', 'Business Social Media Accounts Opening'],
+}
+
+const parseClientProfile = (additionalInfo?: string): ClientProfile => {
+  if (!additionalInfo) return {}
+
+  try {
+    return JSON.parse(additionalInfo)?.clientProfile || {}
+  } catch {
+    return { notes: additionalInfo }
+  }
+}
+
+const getDeliverables = (inquiry: Inquiry): string[] => {
+  const tier = (inquiry.packageTier || 'basic') as 'basic' | 'standard' | 'premium'
+  return inquiry.entityType === 'company' ? companyDeliverables[tier] : soleDeliverables[tier]
+}
+
+const RegistrationProfileForm: React.FC<{
+  inquiry: Inquiry
+  onSaved: () => void
+}> = ({ inquiry, onSaved }) => {
+  const [form, setForm] = useState<ClientProfile>(() => parseClientProfile(inquiry.additionalInfo))
+  const [saving, setSaving] = useState(false)
+  const [message, setMessage] = useState('')
+
+  const updateField = (field: keyof ClientProfile, value: string) => {
+    setForm((current) => ({ ...current, [field]: value }))
+  }
+
+  const saveProfile = async () => {
+    try {
+      setSaving(true)
+      setMessage('')
+      const token = localStorage.getItem('clientToken')
+      const response = await fetch(`/api/client/inquiries/${inquiry.id}/profile`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(form)
+      })
+      const data = await response.json()
+
+      if (!data.success) {
+        throw new Error(data.message || 'Failed to save profile')
+      }
+
+      setMessage('Saved successfully')
+      onSaved()
+    } catch (error: any) {
+      setMessage(error.message || 'Could not save profile')
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  return (
+    <div className="mt-6 border-t border-gray-200 pt-6">
+      <div className="mb-4 flex items-start justify-between">
+        <div>
+          <h4 className="flex items-center text-md font-semibold text-gray-900">
+            <UploadCloud className="h-5 w-5 mr-2 text-primary-600" />
+            Complete Required Information
+          </h4>
+          <p className="mt-1 text-sm text-gray-500">Fill what you know now. Admin will use this to process your registration.</p>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <input className="rounded-lg border border-gray-300 px-3 py-2 text-sm" placeholder="ID / Passport Number" value={form.applicantIdNumber || ''} onChange={(e) => updateField('applicantIdNumber', e.target.value)} />
+        <input className="rounded-lg border border-gray-300 px-3 py-2 text-sm" placeholder="Personal KRA PIN" value={form.applicantKraPin || ''} onChange={(e) => updateField('applicantKraPin', e.target.value)} />
+        <input className="rounded-lg border border-gray-300 px-3 py-2 text-sm" placeholder="Physical Address" value={form.physicalAddress || ''} onChange={(e) => updateField('physicalAddress', e.target.value)} />
+        <input className="rounded-lg border border-gray-300 px-3 py-2 text-sm" placeholder="Postal Address" value={form.postalAddress || ''} onChange={(e) => updateField('postalAddress', e.target.value)} />
+        <textarea className="md:col-span-2 rounded-lg border border-gray-300 px-3 py-2 text-sm" rows={3} placeholder="Directors / partners details: names, phone, email, ID, KRA PIN" value={form.directors || ''} onChange={(e) => updateField('directors', e.target.value)} />
+        <textarea className="md:col-span-2 rounded-lg border border-gray-300 px-3 py-2 text-sm" rows={3} placeholder="Shareholders and share allocation" value={form.shareholders || ''} onChange={(e) => updateField('shareholders', e.target.value)} />
+        <textarea className="md:col-span-2 rounded-lg border border-gray-300 px-3 py-2 text-sm" rows={3} placeholder="Documents available or needed: ID copy, KRA PIN, passport photo, signatures" value={form.requiredDocuments || ''} onChange={(e) => updateField('requiredDocuments', e.target.value)} />
+        <textarea className="md:col-span-2 rounded-lg border border-gray-300 px-3 py-2 text-sm" rows={2} placeholder="Extra notes for admin" value={form.notes || ''} onChange={(e) => updateField('notes', e.target.value)} />
+      </div>
+
+      <div className="mt-4 flex items-center gap-3">
+        <button onClick={saveProfile} disabled={saving} className="rounded-lg bg-primary-600 px-4 py-2 text-sm font-semibold text-white hover:bg-primary-700 disabled:opacity-60">
+          {saving ? 'Saving...' : 'Save Required Information'}
+        </button>
+        {message && <span className="text-sm text-gray-600">{message}</span>}
+      </div>
+    </div>
+  )
 }
 
 const ClientDashboard: React.FC = () => {
@@ -189,7 +301,9 @@ const ClientDashboard: React.FC = () => {
           <div className="bg-white rounded-lg shadow p-12 text-center">
             <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
             <h3 className="text-lg font-medium text-gray-900 mb-2">No inquiries yet</h3>
-            <p className="text-gray-500 mb-4">Submit an inquiry to get started with your business registration.</p>
+            <p className="text-gray-500 mb-4">
+              Submit an inquiry to get started, or sign in with the same email address you used during payment so your registration can appear here.
+            </p>
             <button
               onClick={handleNewInquiry}
               className="inline-flex items-center space-x-2 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
@@ -231,6 +345,20 @@ const ClientDashboard: React.FC = () => {
                 </div>
 
                 <p className="text-sm text-gray-600 mb-4">{inquiry.businessDescription}</p>
+
+                <div className="mb-4 rounded-lg border border-primary-100 bg-primary-50 p-4">
+                  <h4 className="mb-3 text-sm font-semibold text-primary-900">Package Deliverables</h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                    {getDeliverables(inquiry).map((item) => (
+                      <div key={item} className="flex items-center text-sm text-primary-800">
+                        <Clock className="mr-2 h-4 w-4 text-primary-600" />
+                        <span>{item}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <RegistrationProfileForm inquiry={inquiry} onSaved={fetchProfile} />
 
                 {/* Registration Details */}
                 {inquiry.registration ? (

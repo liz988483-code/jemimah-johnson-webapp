@@ -1,7 +1,6 @@
 import { Request, Response } from 'express'
-import crypto from 'crypto'
 import axios from 'axios'
-import { mpesaConfig, generateTimestamp, generatePassword } from '../config/mpesa'
+import { mpesaConfig, generateTimestamp, generatePassword, getSTKPushCallbackUrl } from '../config/mpesa'
 import { createAuditLog } from './auditLogController'
 
 interface AuthRequest extends Request {
@@ -18,6 +17,10 @@ interface AuthRequest extends Request {
 
 // Get OAuth token from M-Pesa
 const getOAuthToken = async (): Promise<string> => {
+  if (!mpesaConfig.consumerKey || !mpesaConfig.consumerSecret) {
+    throw new Error('M-Pesa consumer key or consumer secret is missing')
+  }
+
   const auth = Buffer.from(`${mpesaConfig.consumerKey}:${mpesaConfig.consumerSecret}`).toString('base64')
   
   try {
@@ -32,8 +35,16 @@ const getOAuthToken = async (): Promise<string> => {
     
     return response.data.access_token
   } catch (error: any) {
+    const status = error.response?.status
+    const safaricomError = error.response?.data?.errorMessage || error.response?.data?.error || error.message
+
     console.error('Error getting OAuth token:', error.response?.data || error.message)
-    throw new Error('Failed to get OAuth token from M-Pesa')
+
+    if (status === 400 || status === 401) {
+      throw new Error('M-Pesa rejected the consumer key/secret. Confirm your Daraja sandbox app credentials in .env.')
+    }
+
+    throw new Error(safaricomError || 'Failed to get OAuth token from M-Pesa')
   }
 }
 
@@ -41,14 +52,18 @@ const getOAuthToken = async (): Promise<string> => {
 export const initiateSTKPush = async (req: AuthRequest, res: Response) => {
   try {
     const { phoneNumber, amount, accountReference, transactionDesc } = req.body
-    const user = req.user || req.clientUser
+    
+    // For testing - allow public access (remove this later when you add proper auth)
+    const user = { id: 1, email: 'test@example.com' }
 
-    if (!user) {
-      return res.status(401).json({
-        success: false,
-        message: 'Unauthorized'
-      })
-    }
+    // Original auth check - commented out for testing
+    // const user = req.user || req.clientUser
+    // if (!user) {
+    //   return res.status(401).json({
+    //     success: false,
+    //     message: 'Unauthorized'
+    //   })
+    // }
 
     if (!phoneNumber || !amount) {
       return res.status(400).json({
@@ -57,12 +72,34 @@ export const initiateSTKPush = async (req: AuthRequest, res: Response) => {
       })
     }
 
-    // Format phone number (remove leading 0 and add 254)
-    const formattedPhone = phoneNumber.startsWith('0') 
-      ? `254${phoneNumber.substring(1)}` 
-      : phoneNumber.startsWith('254') 
-      ? phoneNumber 
-      : `254${phoneNumber}`
+    if (!mpesaConfig.passkey || !mpesaConfig.shortcode) {
+      return res.status(500).json({
+        success: false,
+        message: 'M-Pesa shortcode or passkey is missing'
+      })
+    }
+
+    const normalizedPhone = String(phoneNumber).replace(/\D/g, '')
+    const formattedPhone = normalizedPhone.startsWith('0') 
+      ? `254${normalizedPhone.substring(1)}` 
+      : normalizedPhone.startsWith('254') 
+      ? normalizedPhone 
+      : `254${normalizedPhone}`
+    const paymentAmount = Math.round(Number(amount))
+
+    if (!/^2547\d{8}$/.test(formattedPhone)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Enter a valid Safaricom phone number, for example 0742663826'
+      })
+    }
+
+    if (!Number.isFinite(paymentAmount) || paymentAmount < 1) {
+      return res.status(400).json({
+        success: false,
+        message: 'Enter a valid payment amount'
+      })
+    }
 
     // Get OAuth token
     const accessToken = await getOAuthToken()
@@ -77,11 +114,11 @@ export const initiateSTKPush = async (req: AuthRequest, res: Response) => {
       Password: password,
       Timestamp: timestamp,
       TransactionType: 'CustomerPayBillOnline',
-      Amount: amount,
+      Amount: paymentAmount,
       PartyA: formattedPhone,
       PartyB: mpesaConfig.shortcode,
       PhoneNumber: formattedPhone,
-      CallBackURL: `${mpesaConfig.callbackUrl}/stkpush`,
+      CallBackURL: getSTKPushCallbackUrl(),
       AccountReference: accountReference || 'JJA Payment',
       TransactionDesc: transactionDesc || 'Payment for services'
     }
@@ -115,8 +152,11 @@ export const initiateSTKPush = async (req: AuthRequest, res: Response) => {
     res.json({
       success: true,
       message: 'STK Push initiated successfully',
+      ResponseCode: response.data.ResponseCode,
+      CustomerMessage: response.data.CustomerMessage,
       data: {
         MerchantRequestID: response.data.MerchantRequestID,
+        CheckoutRequestID: response.data.CheckoutRequestID,
         CustomerMessage: response.data.CustomerMessage,
         ResponseCode: response.data.ResponseCode,
         ResponseDescription: response.data.ResponseDescription

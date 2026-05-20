@@ -11,16 +11,14 @@ import { authenticate } from '../middleware/auth'
 
 const router = Router()
 
-// Public endpoints (no authentication required for callbacks)
+// Public endpoints (no authentication required)
+router.post('/stkpush', initiateSTKPush)  // ← MOVED UP HERE
 router.post('/stkpush/callback', handleSTKPushCallback)
 router.post('/c2b/validation', handleC2BValidation)
 router.post('/c2b/confirmation', handleC2BConfirmation)
 
-// Authenticated endpoints
+// Authenticated endpoints (AFTER this line)
 router.use(authenticate)
-
-// Initiate STK Push payment
-router.post('/stkpush', initiateSTKPush)
 
 // Query STK Push status
 router.get('/stkpush/status/:merchantRequestID', querySTKPushStatus)

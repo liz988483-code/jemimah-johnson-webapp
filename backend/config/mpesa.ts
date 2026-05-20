@@ -1,3 +1,9 @@
+import dotenv from 'dotenv'
+import path from 'path'
+
+dotenv.config()
+dotenv.config({ path: path.resolve(process.cwd(), '../.env') })
+
 export const mpesaConfig = {
   consumerKey: process.env.MPESA_CONSUMER_KEY || '',
   consumerSecret: process.env.MPESA_CONSUMER_SECRET || '',
@@ -9,6 +15,20 @@ export const mpesaConfig = {
   baseUrl: process.env.MPESA_ENVIRONMENT === 'production' 
     ? 'https://api.safaricom.co.ke' 
     : 'https://sandbox.safaricom.co.ke'
+}
+
+export const getSTKPushCallbackUrl = (): string => {
+  const callbackUrl = mpesaConfig.callbackUrl.replace(/\/+$/, '')
+
+  if (callbackUrl.endsWith('/stkpush/callback')) {
+    return callbackUrl
+  }
+
+  if (callbackUrl.endsWith('/api/mpesa')) {
+    return `${callbackUrl}/stkpush/callback`
+  }
+
+  return `${callbackUrl}/api/mpesa/stkpush/callback`
 }
 
 // Generate timestamp for M-Pesa API

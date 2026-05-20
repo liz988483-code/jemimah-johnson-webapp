@@ -1,8 +1,14 @@
 import React, { useState } from 'react'
+import { Link } from 'react-router-dom'
 import { COMPANY_REGISTRATION_PACKAGES } from '@/utils/constants'
 import SectionTitle from '@/components/common/SectionTitle'
 import Button from '@/components/common/Button'
 import { CheckCircle, Clock, Star, Building, User, X } from 'lucide-react'
+
+const rawApiBaseUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001/api'
+const API_BASE_URL = rawApiBaseUrl.replace(/\/$/, '').endsWith('/api')
+  ? rawApiBaseUrl.replace(/\/$/, '')
+  : `${rawApiBaseUrl.replace(/\/$/, '')}/api`
 
 const CompanyRegistration: React.FC = () => {
   const [selectedType, setSelectedType] = useState<'company' | 'sole'>('company')
@@ -44,22 +50,28 @@ const CompanyRegistration: React.FC = () => {
   const triggerMpesaPush = async (phone: string, amount: number) => {
     try {
       // Formats 07... to 2547...
-      const formattedPhone = phone.startsWith('0') ? '254' + phone.substring(1) : phone;
-      
-      const response = await fetch('http://localhost:5001/api/mpesa/stk-push', {
+      const formattedPhone = phone.startsWith('0') ? '254' + phone.substring(1) : phone
+
+      const response = await fetch(`${API_BASE_URL}/mpesa/stkpush`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          phone: formattedPhone,
-          amount: amount
+          phoneNumber: formattedPhone,
+          amount,
+          accountReference: form.proposedName || 'JJA Registration',
+          transactionDesc: `${selectedPkg?.name || 'Company registration'} payment`
         })
-      });
+      })
 
-      const data = await response.json();
-      return data.ResponseCode === "0"; // "0" means Safaricom accepted the request
+      const data = await response.json()
+      if (!response.ok || !data.success) {
+        throw new Error(data.message || 'Failed to initiate M-Pesa payment')
+      }
+
+      return data.ResponseCode === '0' || data.data?.ResponseCode === '0'
     } catch (err) {
-      console.error("Mpesa Error:", err);
-      return false;
+      console.error("Mpesa Error:", err)
+      throw err
     }
   }
 
@@ -70,14 +82,14 @@ const CompanyRegistration: React.FC = () => {
 
     try {
       // 1. TRIGGER MPESA STK PUSH FIRST
-      const mpesaInitiated = await triggerMpesaPush(form.phone, selectedPkg.price);
+      const mpesaInitiated = await triggerMpesaPush(form.phone, selectedPkg.price)
 
       if (!mpesaInitiated) {
-        throw new Error("Failed to initiate M-Pesa payment. Please check your number and try again.");
+        throw new Error("Failed to initiate M-Pesa payment. Please check your number and try again.")
       }
 
       // 2. SUBMIT DATA TO YOUR BACKEND
-      const response = await fetch('http://localhost:5001/api/inquiry', {
+      const response = await fetch(`${API_BASE_URL}/inquiry`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -86,6 +98,7 @@ const CompanyRegistration: React.FC = () => {
           packageId: selectedPkg?.id,
           packageName: selectedPkg?.name,
           packageTier: selectedPkg?.name?.toLowerCase(),
+          businessDescription: form.businessDescription || `${selectedPkg?.name || 'Company registration'} for ${form.proposedName}`,
           paymentStatus: 'Pending' // Mark as pending until callback verifies it
         })
       })
@@ -98,7 +111,7 @@ const CompanyRegistration: React.FC = () => {
         setError(data.message || 'Something went wrong. Please try again.')
       }
     } catch (err: any) {
-      setError(err.message || 'Could not connect to server.');
+      setError(err.message || 'Could not connect to server.')
     } finally {
       setLoading(false)
     }
@@ -201,9 +214,16 @@ const CompanyRegistration: React.FC = () => {
                     <CheckCircle className="h-16 w-16 text-green-500 mx-auto mb-4" />
                     <h3 className="text-xl font-bold text-secondary-900 mb-2">Payment Initiated!</h3>
                     <p className="text-secondary-600 mb-6">
-                      Please check your phone for the M-Pesa PIN prompt to complete your registration.
+                      Please check your phone for the M-Pesa PIN prompt. After payment, sign in or register with this same email to complete the required KRA, director, shareholder, and document details.
                     </p>
-                    <Button onClick={handleClose}>Close</Button>
+                    <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                      <Link to="/login">
+                        <Button>Sign In</Button>
+                      </Link>
+                      <Link to="/register">
+                        <Button variant="outline">Create Account</Button>
+                      </Link>
+                    </div>
                   </div>
                 ) : (
                   <form onSubmit={handleSubmit} className="space-y-4">

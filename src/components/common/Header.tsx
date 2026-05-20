@@ -127,6 +127,13 @@ const Header: React.FC<HeaderProps> = ({ isMenuOpen, toggleMenu }) => {
               ) : (
                 <>
                   <Link
+                    to="/login"
+                    className="flex items-center space-x-2 text-sm text-secondary-600 hover:text-primary-600 transition-colors"
+                  >
+                    <User className="h-4 w-4" />
+                    <span>Sign In</span>
+                  </Link>
+                  <Link
                     to="/register"
                     className="btn-primary text-sm px-4 py-2"
                   >
@@ -211,6 +218,14 @@ const Header: React.FC<HeaderProps> = ({ isMenuOpen, toggleMenu }) => {
                   </>
                 ) : (
                   <>
+                    <Link
+                      to="/login"
+                      onClick={closeMenu}
+                      className="flex items-center space-x-2 px-4 py-3 rounded-lg text-sm font-medium transition-colors duration-200 hover:bg-primary-50 hover:text-primary-600 text-secondary-700"
+                    >
+                      <User className="h-4 w-4" />
+                      <span>Sign In</span>
+                    </Link>
                     <Link
                       to="/register"
                       onClick={closeMenu}

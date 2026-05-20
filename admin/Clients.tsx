@@ -37,6 +37,7 @@ const Clients: React.FC = () => {
   const [showModal, setShowModal] = useState(false)
   const [editMode, setEditMode] = useState(false)
   const [formData, setFormData] = useState<Partial<Client>>({})
+  const [saving, setSaving] = useState(false)
 
   useEffect(() => {
     fetchClients()
@@ -61,7 +62,12 @@ const Clients: React.FC = () => {
       const data = await response.json()
 
       if (data.success) {
-        setClients(data.data)
+        // Ensure _id is set properly
+        const mappedClients = data.data.map((client: any) => ({
+          ...client,
+          _id: client._id || client.id
+        }))
+        setClients(mappedClients)
         setPagination(data.pagination)
       }
     } catch (error) {
@@ -72,7 +78,14 @@ const Clients: React.FC = () => {
   }
 
   const updateClient = async (clientId: string, updateData: Partial<Client>) => {
+    if (!clientId) {
+      console.error('Client ID is missing!')
+      alert('Error: Client ID not found. Please try again.')
+      return
+    }
+
     try {
+      setSaving(true)
       const token = localStorage.getItem('adminToken')
       const response = await fetch(`/api/clients/${clientId}`, {
         method: 'PATCH',
@@ -84,45 +97,79 @@ const Clients: React.FC = () => {
       })
 
       if (response.ok) {
+        alert('Client updated successfully!')
         fetchClients()
         setShowModal(false)
         setEditMode(false)
         setSelectedClient(null)
+        setFormData({})
+      } else {
+        const errorData = await response.json()
+        alert(`Error updating client: ${errorData.message || 'Unknown error'}`)
       }
     } catch (error) {
       console.error('Error updating client:', error)
+      alert('Error updating client. Please try again.')
+    } finally {
+      setSaving(false)
     }
   }
 
   const deleteClient = async (clientId: string) => {
+    if (!clientId) {
+      console.error('Client ID is missing!')
+      return
+    }
+
     if (window.confirm('Are you sure you want to delete this client?')) {
       try {
+        const token = localStorage.getItem('adminToken')
         const response = await fetch(`/api/clients/${clientId}`, {
           method: 'DELETE',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          }
         })
 
         if (response.ok) {
+          alert('Client deleted successfully!')
           fetchClients()
           setShowModal(false)
           setSelectedClient(null)
+        } else {
+          alert('Error deleting client')
         }
       } catch (error) {
         console.error('Error deleting client:', error)
+        alert('Error deleting client. Please try again.')
       }
     }
   }
 
   const handleEdit = (client: Client) => {
-    setSelectedClient(client)
-    setFormData(client)
+    const clientWithId = {
+      ...client,
+      _id: client._id || (client as any).id
+    }
+    setSelectedClient(clientWithId)
+    setFormData({ ...clientWithId })
     setEditMode(true)
     setShowModal(true)
   }
 
   const handleSave = () => {
-    if (selectedClient) {
-      updateClient(selectedClient._id, formData)
+    if (!selectedClient || !selectedClient._id) {
+      console.error('Selected client or client ID is missing', selectedClient)
+      alert('Error: Client ID not found. Please try again.')
+      return
     }
+
+    if (!formData.name || !formData.email || !formData.phone) {
+      alert('Please fill in all required fields: Name, Email, Phone')
+      return
+    }
+
+    updateClient(selectedClient._id, formData)
   }
 
   const getStatusColor = (status: string) => {
@@ -244,7 +291,11 @@ const Clients: React.FC = () => {
                     <div className="flex items-center space-x-2">
                       <button
                         onClick={() => {
-                          setSelectedClient(client)
+                          const clientWithId = {
+                            ...client,
+                            _id: client._id || (client as any).id
+                          }
+                          setSelectedClient(clientWithId)
                           setEditMode(false)
                           setShowModal(true)
                         }}
@@ -259,7 +310,7 @@ const Clients: React.FC = () => {
                         <Edit className="h-4 w-4" />
                       </button>
                       <button
-                        onClick={() => deleteClient(client._id)}
+                        onClick={() => deleteClient(client._id || (client as any).id)}
                         className="text-red-600 hover:text-red-900"
                       >
                         <Trash2 className="h-4 w-4" />
@@ -339,11 +390,11 @@ const Clients: React.FC = () => {
                     </h3>
                     <div className="space-y-4">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700">Name</label>
+                        <label className="block text-sm font-medium text-gray-700">Name *</label>
                         {editMode ? (
                           <input
                             type="text"
-                            className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
+                            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500 sm:text-sm px-3 py-2"
                             value={formData.name || ''}
                             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                           />
@@ -352,11 +403,11 @@ const Clients: React.FC = () => {
                         )}
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700">Email</label>
+                        <label className="block text-sm font-medium text-gray-700">Email *</label>
                         {editMode ? (
                           <input
                             type="email"
-                            className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
+                            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500 sm:text-sm px-3 py-2"
                             value={formData.email || ''}
                             onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                           />
@@ -365,11 +416,11 @@ const Clients: React.FC = () => {
                         )}
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700">Phone</label>
+                        <label className="block text-sm font-medium text-gray-700">Phone *</label>
                         {editMode ? (
                           <input
                             type="text"
-                            className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
+                            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500 sm:text-sm px-3 py-2"
                             value={formData.phone || ''}
                             onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                           />
@@ -382,7 +433,7 @@ const Clients: React.FC = () => {
                         {editMode ? (
                           <input
                             type="text"
-                            className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
+                            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500 sm:text-sm px-3 py-2"
                             value={formData.company || ''}
                             onChange={(e) => setFormData({ ...formData, company: e.target.value })}
                           />
@@ -394,7 +445,7 @@ const Clients: React.FC = () => {
                         <label className="block text-sm font-medium text-gray-700">Status</label>
                         {editMode ? (
                           <select
-                            className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm rounded-md"
+                            className="mt-1 block w-full pl-3 pr-10 py-2 text-base border border-gray-300 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm rounded-md"
                             value={formData.status || ''}
                             onChange={(e) => setFormData({ ...formData, status: e.target.value as any })}
                           >
@@ -433,14 +484,16 @@ const Clients: React.FC = () => {
                   <>
                     <button
                       type="button"
-                      className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-primary-600 text-base font-medium text-white hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 sm:ml-3 sm:w-auto sm:text-sm"
+                      disabled={saving}
+                      className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-primary-600 text-base font-medium text-white hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 sm:ml-3 sm:w-auto sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed"
                       onClick={handleSave}
                     >
-                      Save
+                      {saving ? 'Saving...' : 'Save'}
                     </button>
                     <button
                       type="button"
-                      className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
+                      disabled={saving}
+                      className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm disabled:opacity-50"
                       onClick={() => {
                         setEditMode(false)
                         setFormData(selectedClient)

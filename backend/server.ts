@@ -15,7 +15,7 @@ import mpesaRoutes from './routes/mpesa'
 
 import { errorHandler, notFound } from './middleware/errorHandler'
 
-dotenv.config()
+dotenv.config({ path: '../.env' })
 
 const app = express()
 const PORT = process.env.PORT || 5001
@@ -36,11 +36,26 @@ const PORT = process.env.PORT || 5001
 
 // Temporarily skip DB - will fix later
 console.log('⚠️ Database connection skipped for testing')
+console.log(`MPESA_CONSUMER_KEY: ${process.env.MPESA_CONSUMER_KEY ? '✅ Loaded' : '❌ Missing'}`)
+console.log(`MPESA_CONSUMER_SECRET: ${process.env.MPESA_CONSUMER_SECRET ? '✅ Loaded' : '❌ Missing'}`)
 
 // Middleware
 app.use(helmet())
+const allowedOrigins = [
+  process.env.FRONTEND_URL,
+  'http://localhost:3000',
+  'http://localhost:3001',
+].filter(Boolean)
+
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:3001',
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true)
+      return
+    }
+
+    callback(new Error(`CORS blocked origin: ${origin}`))
+  },
   credentials: true
 }))
 app.use(morgan('combined'))

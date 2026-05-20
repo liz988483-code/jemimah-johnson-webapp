@@ -4,7 +4,8 @@ import {
   registerClient,
   clientLogin,
   getClientProfile,
-  updateClientProfile
+  updateClientProfile,
+  updateClientInquiryProfile
 } from '../controllers/clientAuthController'
 import { authenticate } from '../middleware/auth'
 
@@ -29,5 +30,6 @@ router.use(authenticate)
 // Profile routes
 router.get('/profile', getClientProfile)
 router.patch('/profile', updateClientProfile)
+router.patch('/inquiries/:id/profile', updateClientInquiryProfile)
 
 export default router
