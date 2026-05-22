@@ -20,24 +20,20 @@ dotenv.config({ path: '../.env' })
 const app = express()
 const PORT = process.env.PORT || 5001
 
-// Connect DB - TEMPORARILY DISABLED FOR TESTING
-// sequelize.authenticate()
-//   .then(() => {
-//     console.log('MySQL connected successfully')
-//     return sequelize.sync({ alter: true })
-//   })
-//   .then(() => {
-//     console.log('Database synchronized successfully')
-//   })
-//   .catch((err) => {
-//     console.error('MySQL connection error:', err)
-//     process.exit(1)
-//   })
-
-// Temporarily skip DB - will fix later
-console.log('⚠️ Database connection skipped for testing')
-console.log(`MPESA_CONSUMER_KEY: ${process.env.MPESA_CONSUMER_KEY ? '✅ Loaded' : '❌ Missing'}`)
-console.log(`MPESA_CONSUMER_SECRET: ${process.env.MPESA_CONSUMER_SECRET ? '✅ Loaded' : '❌ Missing'}`)
+// Connect DB - ENABLED with FORCE SYNC
+sequelize.authenticate()
+  .then(() => {
+    console.log('✅ MySQL connected successfully')
+    // CHANGE THIS LINE: force: true will drop and recreate the table
+    return sequelize.sync({ force: true })
+  })
+  .then(() => {
+    console.log('✅ Database synchronized successfully with force: true')
+  })
+  .catch((err) => {
+    console.error('❌ MySQL connection error:', err)
+    process.exit(1)
+  })
 
 // Middleware
 app.use(helmet())
@@ -90,7 +86,7 @@ app.use('*', (_req, res) => {
 
 // Start server
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`)
+  console.log(`🚀 Server running on port ${PORT}`)
   console.log(`Environment: ${process.env.NODE_ENV}`)
 })
 

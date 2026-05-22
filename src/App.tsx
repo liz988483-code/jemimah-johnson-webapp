@@ -3,6 +3,9 @@ import MainLayout from './layouts/MainLayout'
 import Home from './pages/Home'
 import Services from './pages/Services'
 import CompanyRegistration from './pages/CompanyRegistration'
+import Accounting from './pages/Accounting'
+import Taxation from './pages/taxation'
+import Advisory from './pages/Advisory'
 import Pricing from './pages/Pricing'
 import Contact from './pages/Contact'
 import About from './pages/About'
@@ -14,6 +17,7 @@ import Dashboard from '../admin/Dashboard'
 import Clients from '../admin/Clients'
 import Inquiries from '../admin/Inquiries'
 import Packages from '../admin/Packages'
+import QuoteResponses from '../admin/QuoteResponses' // ← ADD THIS IMPORT
 import ClientLogin from './pages/ClientLogin'
 import ClientRegister from './pages/ClientRegister'
 import ClientDashboard from './pages/ClientDashboard'
@@ -26,6 +30,9 @@ function App() {
           <Route index element={<Home />} />
           <Route path="services" element={<Services />} />
           <Route path="company-registration" element={<CompanyRegistration />} />
+          <Route path="accounting" element={<Accounting />} />
+          <Route path="taxation" element={<Taxation />} />
+          <Route path="advisory" element={<Advisory />} />
           <Route path="pricing" element={<Pricing />} />
           <Route path="contact" element={<Contact />} />
           <Route path="about" element={<About />} />
@@ -43,6 +50,7 @@ function App() {
           <Route path="/admin/clients" element={<Clients />} />
           <Route path="/admin/inquiries" element={<Inquiries />} />
           <Route path="/admin/packages" element={<Packages />} />
+          <Route path="/admin/quotes" element={<QuoteResponses />} /> {/* ← ADD THIS ROUTE */}
           <Route path="/admin" element={<Dashboard />} />
         </Route>
       </Routes>

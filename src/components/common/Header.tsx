@@ -83,7 +83,8 @@ const Header: React.FC<HeaderProps> = ({ isMenuOpen, toggleMenu }) => {
               </div>
             </Link>
 
-            <nav className="hidden md:flex items-center space-x-8">
+            {/* Desktop Navigation - Uses NAVIGATION_ITEMS only */}
+            <nav className="hidden md:flex items-center space-x-6">
               {NAVIGATION_ITEMS.map((item) => (
                 <Link
                   key={item.path}
@@ -141,7 +142,6 @@ const Header: React.FC<HeaderProps> = ({ isMenuOpen, toggleMenu }) => {
                   </Link>
                 </>
               )}
-
             </div>
 
             <button

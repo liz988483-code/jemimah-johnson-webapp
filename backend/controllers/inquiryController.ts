@@ -6,18 +6,52 @@ import { sendInquiryNotification } from '../services/emailService'
 // Create a new inquiry
 export const createInquiry = async (req: Request, res: Response) => {
   try {
-    const { name, email, phone, entityType, packageTier, proposedName, businessDescription, urgency, additionalInfo } = req.body
+    const { 
+      name, 
+      email, 
+      phone, 
+      company,
+      message,
+      serviceType,
+      serviceName,
+      amount,
+      paymentStatus,
+      // Registration-specific fields (optional)
+      entityType,
+      packageTier,
+      proposedName,
+      businessDescription,
+      urgency,
+      additionalInfo
+    } = req.body
     
-    const inquiryData = {
+    // Determine which fields to include based on service type
+    const inquiryData: any = {
       name,
       email,
       phone,
-      entityType,
-      packageTier: packageTier || 'basic',
-      proposedName,
-      businessDescription,
+      company: company || null,
+      message: message || null,
+      serviceType: serviceType || 'registration',
+      serviceName: serviceName || 'Company Registration',
+      paymentStatus: paymentStatus || 'Pending',
+      amount: amount || null,
       urgency: urgency || 'medium',
-      additionalInfo
+      additionalInfo: additionalInfo || null
+    }
+
+    // Only include registration-specific fields for registration services
+    if (serviceType === 'registration' || !serviceType) {
+      inquiryData.entityType = entityType || null
+      inquiryData.proposedName = proposedName || null
+      inquiryData.businessDescription = businessDescription || null
+      inquiryData.packageTier = packageTier || 'basic'
+    } else {
+      // For non-registration services, explicitly set to null
+      inquiryData.entityType = null
+      inquiryData.proposedName = null
+      inquiryData.businessDescription = null
+      inquiryData.packageTier = null
     }
     
     const inquiry = await Inquiry.create(inquiryData)

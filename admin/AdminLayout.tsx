@@ -7,7 +7,8 @@ import {
   Package,
   LogOut,
   Menu,
-  X
+  X,
+  DollarSign // ← ADD THIS IMPORT
 } from 'lucide-react'
 
 const AdminLayout: React.FC = () => {
@@ -26,6 +27,7 @@ const AdminLayout: React.FC = () => {
     { path: '/admin/inquiries', label: 'Inquiries', icon: FileText },
     { path: '/admin/clients', label: 'Clients', icon: Users },
     { path: '/admin/packages', label: 'Packages', icon: Package },
+    { path: '/admin/quotes', label: 'Quote Requests', icon: DollarSign }, // ← ADD THIS
   ]
 
   const isActive = (path: string) => location.pathname === path

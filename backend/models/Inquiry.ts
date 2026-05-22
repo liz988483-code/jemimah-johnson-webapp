@@ -1,123 +1,110 @@
-import { DataTypes, Model, Optional } from 'sequelize'
-import { sequelize } from '../config/database'
-import Registration from './Registration'
+import { DataTypes, Model } from 'sequelize'
+import { sequelize } from '../config/database'  // ← CHANGED THIS LINE
 
-interface InquiryAttributes {
-  id: number
-  name: string
-  email: string
-  phone: string
-  entityType: 'company' | 'sole-proprietorship'
-  packageTier: 'basic' | 'standard' | 'premium'
-  proposedName: string
-  businessDescription: string
-  urgency: 'low' | 'medium' | 'high'
-  additionalInfo?: string
-  status: 'pending' | 'contacted' | 'in-progress' | 'completed'
-  createdAt: Date
-  updatedAt: Date
-  registrationId?: number
-}
-
-interface InquiryCreationAttributes extends Optional<
-  InquiryAttributes,
-  'id' | 'additionalInfo' | 'packageTier' | 'status' | 'createdAt' | 'updatedAt' | 'registrationId'
-> {}
-
-class Inquiry extends Model<InquiryAttributes, InquiryCreationAttributes> implements InquiryAttributes {
+class Inquiry extends Model {
   public id!: number
   public name!: string
   public email!: string
   public phone!: string
-  public entityType!: 'company' | 'sole-proprietorship'
-  public packageTier!: 'basic' | 'standard' | 'premium'
-  public proposedName!: string
-  public businessDescription!: string
-  public urgency!: 'low' | 'medium' | 'high'
-  public additionalInfo?: string
-  public status!: 'pending' | 'contacted' | 'in-progress' | 'completed'
+  public company!: string | null
+  public message!: string | null
+  public serviceType!: string
+  public serviceName!: string
+  public entityType!: string | null
+  public packageTier!: string | null
+  public proposedName!: string | null
+  public businessDescription!: string | null
+  public amount!: number | null
+  public paymentStatus!: string
+  public status!: string
+  public urgency!: string
+  public additionalInfo!: string | null
   public readonly createdAt!: Date
   public readonly updatedAt!: Date
-  public registrationId?: number
 }
 
 Inquiry.init(
   {
     id: {
-      type: DataTypes.INTEGER.UNSIGNED,
+      type: DataTypes.INTEGER,
       autoIncrement: true,
-      primaryKey: true,
+      primaryKey: true
     },
     name: {
-      type: DataTypes.STRING(255),
-      allowNull: false,
+      type: DataTypes.STRING,
+      allowNull: false
     },
     email: {
-      type: DataTypes.STRING(255),
-      allowNull: false,
-      validate: {
-        isEmail: true,
-      },
+      type: DataTypes.STRING,
+      allowNull: false
     },
     phone: {
-      type: DataTypes.STRING(20),
+      type: DataTypes.STRING,
+      allowNull: false
+    },
+    company: {
+      type: DataTypes.STRING,
+      allowNull: true
+    },
+    message: {
+      type: DataTypes.TEXT,
+      allowNull: true
+    },
+    serviceType: {
+      type: DataTypes.STRING,
       allowNull: false,
+      defaultValue: 'registration'
+    },
+    serviceName: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      defaultValue: 'Company Registration'
     },
     entityType: {
-      type: DataTypes.ENUM('company', 'sole-proprietorship'),
-      allowNull: false,
+      type: DataTypes.STRING,
+      allowNull: true
     },
     packageTier: {
-      type: DataTypes.ENUM('basic', 'standard', 'premium'),
-      allowNull: false,
-      defaultValue: 'basic',
+      type: DataTypes.STRING,
+      allowNull: true
     },
     proposedName: {
-      type: DataTypes.STRING(255),
-      allowNull: false,
+      type: DataTypes.STRING,
+      allowNull: true
     },
     businessDescription: {
       type: DataTypes.TEXT,
+      allowNull: true
+    },
+    amount: {
+      type: DataTypes.INTEGER,
+      allowNull: true
+    },
+    paymentStatus: {
+      type: DataTypes.STRING,
       allowNull: false,
+      defaultValue: 'Pending'
+    },
+    status: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      defaultValue: 'new'
     },
     urgency: {
-      type: DataTypes.ENUM('low', 'medium', 'high'),
+      type: DataTypes.STRING,
       allowNull: false,
-      defaultValue: 'medium',
+      defaultValue: 'medium'
     },
     additionalInfo: {
       type: DataTypes.TEXT,
-      allowNull: true,
-    },
-    status: {
-      type: DataTypes.ENUM('pending', 'contacted', 'in-progress', 'completed'),
-      allowNull: false,
-      defaultValue: 'pending',
-    },
-    registrationId: {
-      type: DataTypes.INTEGER.UNSIGNED,
-      allowNull: true,
-    },
-    createdAt: {
-      type: DataTypes.DATE,
-      allowNull: false,
-      defaultValue: DataTypes.NOW,
-    },
-    updatedAt: {
-      type: DataTypes.DATE,
-      allowNull: false,
-      defaultValue: DataTypes.NOW,
-    },
+      allowNull: true
+    }
   },
   {
     sequelize,
-    tableName: 'inquiries',
-    timestamps: true,
+    modelName: 'Inquiry',
+    tableName: 'inquiries'
   }
 )
-
-// Associations
-Inquiry.hasOne(Registration, { foreignKey: 'inquiryId', as: 'registration' })
-Registration.belongsTo(Inquiry, { foreignKey: 'inquiryId', as: 'inquiry' })
 
 export default Inquiry

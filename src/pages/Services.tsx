@@ -1,90 +1,80 @@
 import React from 'react'
-import { SERVICES, APP_CONFIG } from '@/utils/constants'
+import { Link } from 'react-router-dom'
 import SectionTitle from '@/components/common/SectionTitle'
-import { CheckCircle, TrendingUp, Shield, Calculator, FileText } from 'lucide-react'
+import { TrendingUp, Shield, Users, Building, FileText, Briefcase } from 'lucide-react'
 
 const Services: React.FC = () => {
-  const serviceData = [
+  const services = [
     {
-      key: 'ACCOUNTING_BOOKKEEPING' as const,
-      icon: FileText,
-      color: 'bg-primary-100'
-    },
-    {
-      key: 'PAYROLL' as const,
-      icon: Calculator,
-      color: 'bg-primary-100'
-    },
-    {
-      key: 'BUSINESS_ADVISORY' as const,
+      id: 'accounting',
+      title: 'Accounting & Bookkeeping',
+      description: 'Accurate financial management and reporting for your business.',
       icon: TrendingUp,
-      color: 'bg-primary-100'
+      link: '/accounting'
     },
     {
-      key: 'TAXATION' as const,
+      id: 'taxation',
+      title: 'Taxation & Compliance',
+      description: 'Expert tax services to keep your business compliant.',
       icon: Shield,
-      color: 'bg-primary-100'
+      link: '/taxation'
+    },
+    {
+      id: 'advisory',
+      title: 'Business Advisory',
+      description: 'Strategic guidance for sustainable business growth.',
+      icon: Users,
+      link: '/advisory'
+    },
+    {
+      id: 'registration',
+      title: 'Company Registration',
+      description: 'Complete registration packages for your business.',
+      icon: Building,
+      link: '/company-registration'
+    },
+    {
+      id: 'payroll',
+      title: 'Payroll Services',
+      description: 'Automated payroll processing and compliance.',
+      icon: FileText,
+      link: '/payroll'
     }
   ]
 
   return (
-    <div className="section-padding">
+    <div className="section-padding pt-32">
       <div className="container-custom">
         <SectionTitle
           title="Our Services"
-          subtitle="Comprehensive business solutions tailored to your needs"
-          description="The focus of our services is to help you grow your business from a professional accounting view. Our functions will save you a lot of time and money and help you concentrate on making your business successful."
+          subtitle="Comprehensive financial solutions for your business"
         />
-
-        {serviceData.map((service) => {
-          const serviceInfo = SERVICES[service.key as keyof typeof SERVICES]
-          const IconComponent = service.icon
-          
-          return (
-            <section key={service.key} className="mb-16">
-              <div className="bg-white rounded-2xl shadow-lg p-8">
-                <div className="flex items-center mb-6">
-                  <div className={`p-3 ${service.color} rounded-lg mr-4`}>
-                    <IconComponent className="h-6 w-6 text-primary-600" />
+        
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {services.map((service) => {
+            const Icon = service.icon
+            return (
+              <Link
+                key={service.id}
+                to={service.link}
+                className="card hover:shadow-xl transition-all hover:-translate-y-1"
+              >
+                <div className="flex items-center mb-4">
+                  <div className="p-3 bg-primary-100 rounded-lg">
+                    <Icon className="h-6 w-6 text-primary-600" />
                   </div>
-                  <h2 className="text-2xl font-bold text-secondary-900">
-                    {serviceInfo.title}
-                  </h2>
+                  <h3 className="text-xl font-semibold text-secondary-900 ml-3">
+                    {service.title}
+                  </h3>
                 </div>
-                
-                <p className="text-secondary-700 mb-6 leading-relaxed">
-                  {serviceInfo.description}
-                </p>
-                
-                <ul className="space-y-3">
-                  {serviceInfo.features.map((feature, index) => (
-                    <li key={index} className="flex items-start">
-                      <CheckCircle className="h-5 w-5 text-primary-500 mr-3 mt-0.5 flex-shrink-0" />
-                      <span className="text-secondary-700">{feature}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </section>
-          )
-        })}
-
-        {/* CTA Section */}
-        <section className="text-center">
-          <div className="bg-gradient-to-r from-primary-500 to-primary-600 rounded-2xl p-8 text-white">
-            <h2 className="text-2xl font-bold mb-4">
-              Need Professional Accounting Services?
-            </h2>
-            <p className="text-primary-100 mb-6">
-              Contact us today to discuss how we can help your business grow.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <a href={`tel:${APP_CONFIG.contact.phone}`} className="inline-flex items-center justify-center bg-white text-primary-600 px-6 py-3 rounded-lg font-medium hover:bg-gray-50 transition-colors">
-                Call Us: {APP_CONFIG.contact.phone}
-              </a>
-            </div>
-          </div>
-        </section>
+                <p className="text-secondary-600">{service.description}</p>
+                <div className="mt-4 text-primary-600 font-semibold">
+                  Learn more →
+                </div>
+              </Link>
+            )
+          })}
+        </div>
       </div>
     </div>
   )

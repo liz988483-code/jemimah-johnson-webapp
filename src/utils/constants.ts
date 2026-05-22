@@ -173,6 +173,9 @@ export const NAVIGATION_ITEMS = [
   { name: 'Home', path: '/' },
   { name: 'Services', path: '/services' },
   { name: 'Company Registration', path: '/company-registration' },
+  { name: 'Accounting', path: '/accounting' },
+  { name: 'Taxation', path: '/taxation' },
+  { name: 'Advisory', path: '/advisory' },
   { name: 'Pricing', path: '/pricing' },
   { name: 'About', path: '/about' },
   { name: 'Contact', path: '/contact' }
