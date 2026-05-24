@@ -23,15 +23,15 @@ const PORT = process.env.PORT || 5001
 // Connect DB - ENABLED with FORCE SYNC
 sequelize.authenticate()
   .then(() => {
-    console.log('✅ MySQL connected successfully')
-    // CHANGE THIS LINE: force: true will drop and recreate the table
-    return sequelize.sync({ alter: true })
+    console.log('✅ PostgreSQL connected successfully')
+    // Don't sync - just let it run
+    return Promise.resolve()
   })
   .then(() => {
-  console.log('✅ PostgreSQL connected and synchronized')
-})
+    console.log('✅ Database connected')
+  })
   .catch((err) => {
-    console.error('❌ MySQL connection error:', err)
+    console.error('❌ PostgreSQL connection error:', err)
     process.exit(1)
   })
 
