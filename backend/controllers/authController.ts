@@ -6,7 +6,7 @@ export const adminLogin = async (req: Request, res: Response) => {
     const { email, password } = req.body
 
     // Validate credentials from environment variables
-    const adminEmail = process.env.ADMIN_EMAIL || 'admin@jemimahjohnston.com'
+    const adminEmail = process.env.ADMIN_EMAIL || 'admin@jemimahjohnson.com'
     const adminPassword = process.env.ADMIN_PASSWORD || 'jemimah@2024'
 
     if (email !== adminEmail || password !== adminPassword) {

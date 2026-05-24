@@ -1,7 +1,6 @@
 import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Mail, Lock, User, Phone, ArrowRight, Eye, EyeOff } from 'lucide-react'
-import API_BASE_URL from '../config/api'
 
 const ClientRegister: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -28,7 +27,7 @@ const ClientRegister: React.FC = () => {
     console.log('ClientRegister - Starting API call')
 
     try {
-      const response = await fetch(`${API_BASE_URL}/api/client/register`, {
+      const response = await fetch('/api/client/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

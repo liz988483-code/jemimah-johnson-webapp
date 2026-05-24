@@ -1,7 +1,6 @@
 import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Mail, Lock, ArrowRight, Eye, EyeOff } from 'lucide-react'
-import API_BASE_URL from '../config/api'
 
 const ClientLogin: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -24,7 +23,7 @@ const ClientLogin: React.FC = () => {
 
     try {
       // Try client login first
-      const clientRes = await fetch(`${API_BASE_URL}/api/client/login`, {
+      const clientRes = await fetch('/api/client/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)
@@ -39,7 +38,7 @@ const ClientLogin: React.FC = () => {
       }
 
       // Fall back to admin login
-      const adminRes = await fetch(`${API_BASE_URL}/api/admin/login`, {
+      const adminRes = await fetch('/api/admin/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)

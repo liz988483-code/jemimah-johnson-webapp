@@ -25,11 +25,11 @@ sequelize.authenticate()
   .then(() => {
     console.log('✅ MySQL connected successfully')
     // CHANGE THIS LINE: force: true will drop and recreate the table
-    return sequelize.sync({ force: true })
+    return sequelize.sync({ alter: true })
   })
   .then(() => {
-    console.log('✅ Database synchronized successfully with force: true')
-  })
+  console.log('✅ PostgreSQL connected and synchronized')
+})
   .catch((err) => {
     console.error('❌ MySQL connection error:', err)
     process.exit(1)
@@ -41,6 +41,7 @@ const allowedOrigins = [
   process.env.FRONTEND_URL,
   'http://localhost:3000',
   'http://localhost:3001',
+  'http://localhost:3002',
 ].filter(Boolean)
 
 app.use(cors({

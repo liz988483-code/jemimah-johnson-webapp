@@ -16,7 +16,7 @@ export default defineConfig({
     },
   },
   server: {
-    port: 3000,
+    port: 3001,
     proxy: {
       '/api': {
         target: 'http://localhost:5001',
@@ -29,7 +29,4 @@ export default defineConfig({
     outDir: 'dist',
     sourcemap: false,
   },
-  define: {
-    'import.meta.env.VITE_API_URL': JSON.stringify(process.env.VITE_API_URL || '/api')
-  }
 })

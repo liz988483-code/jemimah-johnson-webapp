@@ -126,12 +126,6 @@ export const getClientProfile = async (req: Request, res: Response) => {
     // Get inquiries linked to this user's email
     const inquiries = await Inquiry.findAll({
       where: { email: user.email },
-      include: [
-        {
-          model: require('../models/Registration').default,
-          as: 'registration'
-        }
-      ],
       order: [['createdAt', 'DESC']]
     })
 
