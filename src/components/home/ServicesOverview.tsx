@@ -1,104 +1,110 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
-import { Calculator, FileText, TrendingUp, Users, ArrowRight } from 'lucide-react'
-import SectionTitle from '@/components/common/SectionTitle'
-import Button from '@/components/common/Button'
+import { Calculator, FileText, TrendingUp, Building2, ArrowRight } from 'lucide-react'
+
+const mainServices = [
+  {
+    id: 'accounting',
+    title: 'Accounting & Bookkeeping',
+    description: 'Clean records and dependable financial reporting.',
+    icon: <Calculator className="h-6 w-6 text-white" />,
+    iconBg: 'bg-primary-500',
+    accentColor: 'border-primary-500',
+    features: ['Bookkeeping', 'Financial Statements', 'Payroll Management', 'Budget Planning'],
+    link: '/accounting',
+  },
+  {
+    id: 'tax',
+    title: 'Taxation & Compliance',
+    description: 'Planning, filing, and compliance without the stress.',
+    icon: <FileText className="h-6 w-6 text-white" />,
+    iconBg: 'bg-red-500',
+    accentColor: 'border-red-500',
+    features: ['Tax Planning', 'VAT Services', 'Corporate Tax', 'Tax Advisory'],
+    link: '/taxation',
+  },
+  {
+    id: 'advisory',
+    title: 'Business Advisory',
+    description: 'Practical guidance for sharper business decisions.',
+    icon: <TrendingUp className="h-6 w-6 text-white" />,
+    iconBg: 'bg-secondary-800',
+    accentColor: 'border-secondary-800',
+    features: ['Business Planning', 'Financial Analysis', 'Risk Management', 'Growth Strategy'],
+    link: '/advisory',
+  },
+  {
+    id: 'registration',
+    title: 'Company Registration',
+    description: 'Fast business setup with clear filing support.',
+    icon: <Building2 className="h-6 w-6 text-white" />,
+    iconBg: 'bg-primary-500',
+    accentColor: 'border-primary-500',
+    features: ['Company Registration', 'Business Permits', 'Tax Registration', 'Legal Compliance'],
+    link: '/company-registration',
+  },
+]
 
 const ServicesOverview: React.FC = () => {
-  const serviceIcons = {
-    accounting: <Calculator className="h-8 w-8" />,
-    tax: <FileText className="h-8 w-8" />,
-    advisory: <TrendingUp className="h-8 w-8" />,
-    registration: <Users className="h-8 w-8" />
-  }
-
-  const mainServices = [
-    {
-      id: 'accounting',
-      title: 'Accounting Services',
-      description: 'Comprehensive accounting solutions including bookkeeping, financial statements, and payroll management.',
-      icon: serviceIcons.accounting,
-      features: ['Bookkeeping', 'Financial Statements', 'Payroll Management', 'Budget Planning'],
-      link: '/services'
-    },
-    {
-      id: 'tax',
-      title: 'Tax Services',
-      description: 'Expert tax planning, compliance, and advisory services to optimize your tax position.',
-      icon: serviceIcons.tax,
-      features: ['Tax Planning', 'VAT Services', 'Corporate Tax', 'Tax Advisory'],
-      link: '/services'
-    },
-    {
-      id: 'advisory',
-      title: 'Business Advisory',
-      description: 'Strategic business consulting to help you make informed decisions and drive growth.',
-      icon: serviceIcons.advisory,
-      features: ['Business Planning', 'Financial Analysis', 'Risk Management', 'Growth Strategy'],
-      link: '/services'
-    },
-    {
-      id: 'registration',
-      title: 'Company Registration',
-      description: 'Fast and efficient business registration services for companies and sole proprietorships.',
-      icon: serviceIcons.registration,
-      features: ['Company Registration', 'Business Permits', 'Tax Registration', 'Legal Compliance'],
-      link: '/company-registration'
-    }
-  ]
-
   return (
-    <section className="py-20 bg-white">
+    <section className="py-20 bg-gray-50">
       <div className="container-custom">
-        <SectionTitle
-          subtitle="Our Services"
-          title="Comprehensive Business Solutions"
-          description="We offer a wide range of professional services to help your business thrive and succeed in today's competitive market."
-        />
+        {/* Section header */}
+        <div className="mb-12">
+          <p className="text-xs font-semibold uppercase tracking-widest text-primary-500 mb-2">Core Support</p>
+          <h2 className="text-3xl md:text-4xl font-bold text-secondary-900">Services That Move With You</h2>
+          <p className="text-secondary-500 mt-3 max-w-xl">
+            Professional financial services tailored to help your business thrive at every stage.
+          </p>
+        </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mt-16">
-          {mainServices.map((service, index) => (
-            <div
+        {/* Cards grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          {mainServices.map((service) => (
+            <Link
               key={service.id}
-              className="card hover:scale-105 transition-transform duration-300"
-              style={{ animationDelay: `${index * 0.1}s` }}
+              to={service.link}
+              className={`group bg-white rounded-xl border border-gray-100 border-l-4 ${service.accentColor} p-6 shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-1 flex flex-col justify-between`}
             >
-              <div className="flex items-center justify-center w-16 h-16 bg-primary-100 rounded-full text-primary-600 mb-6">
-                {service.icon}
+              <div>
+                {/* Icon + arrow row */}
+                <div className="flex items-start justify-between mb-5">
+                  <div className={`${service.iconBg} rounded-xl p-3`}>
+                    {service.icon}
+                  </div>
+                  <ArrowRight className="h-5 w-5 text-gray-300 group-hover:text-primary-500 group-hover:translate-x-1 transition-all duration-200 mt-1" />
+                </div>
+
+                {/* Title + description */}
+                <h3 className="text-base font-bold text-secondary-900 mb-1.5 group-hover:text-primary-600 transition-colors">
+                  {service.title}
+                </h3>
+                <p className="text-sm text-secondary-500 leading-relaxed mb-4">
+                  {service.description}
+                </p>
+
+                {/* Feature list */}
+                <ul className="space-y-1.5">
+                  {service.features.map((feature) => (
+                    <li key={feature} className="flex items-center gap-2 text-xs text-secondary-500">
+                      <div className="w-1 h-1 rounded-full bg-primary-400 shrink-0" />
+                      {feature}
+                    </li>
+                  ))}
+                </ul>
               </div>
-              <h3 className="text-xl font-semibold text-secondary-900 mb-4">
-                {service.title}
-              </h3>
-              <p className="text-secondary-600 mb-6 text-sm leading-relaxed">
-                {service.description}
-              </p>
-              <ul className="space-y-2 mb-6">
-                {service.features.map((feature, featureIndex) => (
-                  <li
-                    key={featureIndex}
-                    className="flex items-center text-sm text-secondary-600"
-                  >
-                    <div className="w-1.5 h-1.5 bg-primary-600 rounded-full mr-2" />
-                    {feature}
-                  </li>
-                ))}
-              </ul>
-              <Link to={service.link}>
-                <Button variant="outline" size="sm" className="w-full">
-                  Learn More
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Button>
-              </Link>
-            </div>
+            </Link>
           ))}
         </div>
 
-        <div className="text-center mt-12">
-          <Link to="/services">
-            <Button size="lg">
-              View All Services
-              <ArrowRight className="ml-2 h-5 w-5" />
-            </Button>
+        {/* CTA */}
+        <div className="text-center mt-10">
+          <Link
+            to="/services"
+            className="inline-flex items-center gap-2 bg-primary-500 hover:bg-primary-600 text-white font-semibold px-8 py-3 rounded-lg transition-colors duration-200"
+          >
+            View All Services
+            <ArrowRight className="h-4 w-4" />
           </Link>
         </div>
       </div>

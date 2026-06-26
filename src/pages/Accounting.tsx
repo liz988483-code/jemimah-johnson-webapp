@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import SectionTitle from '@/components/common/SectionTitle'
 import Button from '@/components/common/Button'
+import { apiUrl } from '@/config/api'
 import { TrendingUp, CheckCircle, Clock, DollarSign, FileText, X } from 'lucide-react'
 
 const Accounting: React.FC = () => {
@@ -34,7 +35,7 @@ const Accounting: React.FC = () => {
   const triggerMpesaPush = async (phone: string, amount: number) => {
     try {
       const formattedPhone = phone.startsWith('0') ? '254' + phone.substring(1) : phone
-      const response = await fetch('http://localhost:5001/api/mpesa/stkpush', {
+      const response = await fetch(apiUrl('/mpesa/stkpush'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -78,7 +79,7 @@ const Accounting: React.FC = () => {
 
       console.log('Sending payload:', payload)
 
-      const response = await fetch('http://localhost:5001/api/inquiry', {
+      const response = await fetch(apiUrl('/inquiry'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)

@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { APP_CONFIG } from '@/utils/constants'
 import SectionTitle from '@/components/common/SectionTitle'
 import Button from '@/components/common/Button'
+import { apiUrl } from '@/config/api'
 import { Phone, Mail, MapPin, Clock, Send, MessageSquare } from 'lucide-react'
 
 interface FormData {
@@ -36,7 +37,7 @@ const Contact: React.FC = () => {
     setIsSubmitting(true)
 
     try {
-      const response = await fetch('http://localhost:5001/api/contact', {
+      const response = await fetch(apiUrl('/contact'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)

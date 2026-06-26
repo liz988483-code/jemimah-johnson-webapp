@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { CheckCircle, X, DollarSign } from 'lucide-react'
 import Button from '@/components/common/Button'
+import { apiUrl } from '@/config/api'
 
 const QuoteResponses: React.FC = () => {
   const [quotes, setQuotes] = useState<any[]>([])
@@ -15,7 +16,7 @@ const QuoteResponses: React.FC = () => {
 
   const fetchQuoteRequests = async () => {
     try {
-      const response = await fetch('http://localhost:5001/api/inquiries?status=Quote Requested')
+      const response = await fetch(apiUrl('/inquiries?status=Quote Requested'))
       const data = await response.json()
       if (data.success) {
         setQuotes(data.data)
@@ -33,7 +34,7 @@ const QuoteResponses: React.FC = () => {
 
     try {
       // Update inquiry with price and status
-      const response = await fetch(`http://localhost:5001/api/inquiry/${selectedQuote.id}`, {
+      const response = await fetch(apiUrl(`/inquiry/${selectedQuote.id}`), {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

@@ -3,12 +3,8 @@ import { Link } from 'react-router-dom'
 import { COMPANY_REGISTRATION_PACKAGES } from '@/utils/constants'
 import SectionTitle from '@/components/common/SectionTitle'
 import Button from '@/components/common/Button'
+import { apiUrl } from '@/config/api'
 import { CheckCircle, Clock, Star, Building, User, X } from 'lucide-react'
-
-const rawApiBaseUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001/api'
-const API_BASE_URL = rawApiBaseUrl.replace(/\/$/, '').endsWith('/api')
-  ? rawApiBaseUrl.replace(/\/$/, '')
-  : `${rawApiBaseUrl.replace(/\/$/, '')}/api`
 
 const CompanyRegistration: React.FC = () => {
   const [selectedType, setSelectedType] = useState<'company' | 'sole'>('company')
@@ -52,7 +48,7 @@ const CompanyRegistration: React.FC = () => {
       // Formats 07... to 2547...
       const formattedPhone = phone.startsWith('0') ? '254' + phone.substring(1) : phone
 
-      const response = await fetch(`${API_BASE_URL}/mpesa/stkpush`, {
+      const response = await fetch(apiUrl('/mpesa/stkpush'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -89,7 +85,7 @@ const CompanyRegistration: React.FC = () => {
       }
 
       // 2. SUBMIT DATA TO YOUR BACKEND
-      const response = await fetch(`${API_BASE_URL}/inquiry`, {
+      const response = await fetch(apiUrl('/inquiry'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

@@ -5,36 +5,35 @@ import Footer from '@/components/common/Footer'
 
 const MainLayout: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
-  const [headerHeight, setHeaderHeight] = useState(0)
+  const [headerHeight, setHeaderHeight] = useState(100)
 
-  const toggleMenu = () => {
-    setIsMenuOpen(!isMenuOpen)
-  }
+  const toggleMenu = () => setIsMenuOpen(!isMenuOpen)
 
-  // Measure header height dynamically
   useEffect(() => {
-    const header = document.querySelector('header')
-    if (header) {
-      setHeaderHeight(header.offsetHeight)
-    }
-
-    const handleResize = () => {
+    const measure = () => {
       const header = document.querySelector('header')
-      if (header) {
-        setHeaderHeight(header.offsetHeight)
-      }
+      if (header) setHeaderHeight(header.offsetHeight)
     }
 
-    window.addEventListener('resize', handleResize)
-    return () => window.removeEventListener('resize', handleResize)
+    // Measure after fonts/images have loaded so logo height is final
+    measure()
+    window.addEventListener('resize', measure)
+
+    // Re-measure after a short delay to catch logo load
+    const t = setTimeout(measure, 300)
+
+    return () => {
+      window.removeEventListener('resize', measure)
+      clearTimeout(t)
+    }
   }, [])
 
   return (
     <div className="min-h-screen flex flex-col">
       <Header isMenuOpen={isMenuOpen} toggleMenu={toggleMenu} />
-      <main 
-        className="flex-grow" 
-        style={{ paddingTop: `${headerHeight + 20}px` }}
+      <main
+        className="flex-grow"
+        style={{ paddingTop: `${headerHeight}px` }}
       >
         <Outlet />
       </main>

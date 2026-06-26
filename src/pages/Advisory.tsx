@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import SectionTitle from '@/components/common/SectionTitle'
 import Button from '@/components/common/Button'
+import { apiUrl } from '@/config/api'
 import { Users, CheckCircle, Briefcase, TrendingUp, Target, X } from 'lucide-react'
 
 const Advisory: React.FC = () => {
@@ -50,7 +51,7 @@ const Advisory: React.FC = () => {
 
       console.log('Sending payload:', payload)
 
-      const response = await fetch('http://localhost:5001/api/inquiry', {
+      const response = await fetch(apiUrl('/inquiry'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)

@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { apiUrl } from '@/config/api'
 import { Lock, Mail, Eye, EyeOff } from 'lucide-react'
 
 const Login: React.FC = () => {
@@ -16,7 +17,7 @@ const Login: React.FC = () => {
     setLoading(true)
 
     try {
-      const response = await fetch('/api/admin/login', {
+      const response = await fetch(apiUrl('/admin/login'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
