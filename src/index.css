@@ -8,7 +8,20 @@
   }
   
   body {
-    @apply font-sans antialiased;
+    @apply font-sans antialiased overflow-x-hidden;
+  }
+
+  img,
+  video,
+  canvas,
+  svg {
+    max-width: 100%;
+  }
+
+  input,
+  textarea,
+  select {
+    font-size: 16px;
   }
 }
 
@@ -26,15 +39,15 @@
   }
   
   .card {
-    @apply bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 p-6;
+    @apply bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 p-4 sm:p-6;
   }
   
   .section-padding {
-    @apply py-16 px-4 md:px-8 lg:px-16;
+    @apply py-10 px-4 sm:px-6 md:py-14 lg:py-16 lg:px-16;
   }
   
   .container-custom {
-    @apply max-w-7xl mx-auto;
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
   }
   
   .text-gradient {

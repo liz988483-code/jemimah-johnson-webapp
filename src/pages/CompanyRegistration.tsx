@@ -122,11 +122,11 @@ const CompanyRegistration: React.FC = () => {
         />
 
         {/* Toggle */}
-        <div className="flex justify-center mb-12">
-          <div className="bg-secondary-100 rounded-lg p-1 inline-flex">
+        <div className="flex justify-center mb-10 sm:mb-12">
+          <div className="grid w-full grid-cols-1 gap-1 rounded-lg bg-secondary-100 p-1 sm:inline-grid sm:w-auto sm:grid-cols-2">
             <button
               onClick={() => setSelectedType('company')}
-              className={`px-6 py-3 rounded-md font-medium transition-all duration-200 flex items-center space-x-2 ${
+              className={`flex items-center justify-center space-x-2 rounded-md px-4 py-3 text-sm font-medium transition-all duration-200 sm:px-6 ${
                 selectedType === 'company' ? 'bg-white text-primary-600 shadow-sm' : 'text-secondary-600 hover:text-secondary-800'
               }`}
             >
@@ -135,7 +135,7 @@ const CompanyRegistration: React.FC = () => {
             </button>
             <button
               onClick={() => setSelectedType('sole')}
-              className={`px-6 py-3 rounded-md font-medium transition-all duration-200 flex items-center space-x-2 ${
+              className={`flex items-center justify-center space-x-2 rounded-md px-4 py-3 text-sm font-medium transition-all duration-200 sm:px-6 ${
                 selectedType === 'sole' ? 'bg-white text-primary-600 shadow-sm' : 'text-secondary-600 hover:text-secondary-800'
               }`}
             >
@@ -146,11 +146,11 @@ const CompanyRegistration: React.FC = () => {
         </div>
 
         {/* Package Cards */}
-        <div className="grid md:grid-cols-3 gap-8 mb-12">
+        <div className="grid gap-6 mb-12 md:grid-cols-3 lg:gap-8">
           {Object.values(packages).map((pkg) => {
             const isPopular = 'popular' in pkg && pkg.popular
             return (
-              <div key={pkg.id} className={`card relative ${isPopular ? 'ring-2 ring-primary-500 shadow-xl scale-105' : ''}`}>
+              <div key={pkg.id} className={`card relative ${isPopular ? 'ring-2 ring-primary-500 shadow-xl md:scale-105' : ''}`}>
                 {isPopular && (
                   <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
                     <div className="bg-primary-600 text-white px-4 py-1 rounded-full text-sm font-medium flex items-center space-x-1">
@@ -160,8 +160,8 @@ const CompanyRegistration: React.FC = () => {
                   </div>
                 )}
                 <div className="text-center mb-6">
-                  <h3 className="text-2xl font-bold text-secondary-900 mb-2">{pkg.name}</h3>
-                  <div className="text-4xl font-bold text-primary-600 mb-2">KES {pkg.price.toLocaleString()}</div>
+                  <h3 className="text-xl font-bold text-secondary-900 mb-2 sm:text-2xl">{pkg.name}</h3>
+                  <div className="text-3xl font-bold text-primary-600 mb-2 sm:text-4xl">KES {pkg.price.toLocaleString()}</div>
                   <div className="flex items-center justify-center text-sm text-secondary-600">
                     <Clock className="h-4 w-4 mr-1" />
                     {pkg.processingTime}
@@ -189,13 +189,13 @@ const CompanyRegistration: React.FC = () => {
 
         {/* Modal */}
         {showModal && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+          <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-3 sm:p-4">
             <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
               
-              <div className="bg-primary-600 text-white p-6 rounded-t-2xl flex justify-between items-start">
-                <div>
+              <div className="bg-primary-600 text-white p-4 sm:p-6 rounded-t-2xl flex justify-between items-start gap-4">
+                <div className="min-w-0">
                   <h2 className="text-xl font-bold">Complete Registration</h2>
-                  <p className="text-primary-100 text-sm mt-1">
+                  <p className="text-primary-100 text-sm mt-1 break-words">
                     {selectedPkg?.name} — KES {selectedPkg?.price?.toLocaleString()}
                   </p>
                 </div>
@@ -204,7 +204,7 @@ const CompanyRegistration: React.FC = () => {
                 </button>
               </div>
 
-              <div className="p-6">
+              <div className="p-4 sm:p-6">
                 {success ? (
                   <div className="text-center py-8">
                     <CheckCircle className="h-16 w-16 text-green-500 mx-auto mb-4" />
@@ -229,7 +229,7 @@ const CompanyRegistration: React.FC = () => {
                       </div>
                     )}
 
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                       <div>
                         <label className="block text-sm font-medium text-secondary-700 mb-1">Full Name *</label>
                         <input

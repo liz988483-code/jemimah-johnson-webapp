@@ -38,41 +38,41 @@ const coreServices = [
 
 const HeroSection: React.FC = () => {
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
+    <section className="relative flex min-h-[calc(100vh-7rem)] items-center justify-center overflow-hidden">
       {/* Background */}
       <div className="absolute inset-0 bg-gradient-to-br from-primary-50 via-white to-secondary-50">
         <div className="absolute inset-0 bg-black/5" />
       </div>
 
       {/* Content */}
-      <div className="relative z-10 section-padding pt-8">
+      <div className="relative z-10 section-padding py-12 sm:py-16">
         <div className="container-custom">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-12 items-center">
             {/* Left Content */}
-            <div className="space-y-8 fade-in">
-              <div className="space-y-4">
-                <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-secondary-900 leading-tight">
+            <div className="space-y-6 sm:space-y-8 fade-in">
+              <div className="space-y-3 sm:space-y-4">
+                <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-secondary-900 leading-tight">
                   {APP_CONFIG.name}
                 </h1>
-                <p className="text-2xl font-bold text-primary-500">
+                <p className="text-xl sm:text-2xl font-bold text-primary-500">
                   {APP_CONFIG.tagline}
                 </p>
-                <p className="text-xl text-secondary-600 leading-relaxed">
+                <p className="text-base sm:text-lg lg:text-xl text-secondary-600 leading-relaxed">
                   {APP_CONFIG.description}
                 </p>
               </div>
 
               {/* Key Benefits */}
               <div className="space-y-3">
-                <div className="flex items-center space-x-3">
+                <div className="flex items-start space-x-3">
                   <CheckCircle className="h-6 w-6 text-primary-600 flex-shrink-0" />
                   <span className="text-secondary-700 font-medium">Expert Professional Services</span>
                 </div>
-                <div className="flex items-center space-x-3">
+                <div className="flex items-start space-x-3">
                   <CheckCircle className="h-6 w-6 text-primary-600 flex-shrink-0" />
                   <span className="text-secondary-700 font-medium">Fast & Efficient Processing</span>
                 </div>
-                <div className="flex items-center space-x-3">
+                <div className="flex items-start space-x-3">
                   <CheckCircle className="h-6 w-6 text-primary-600 flex-shrink-0" />
                   <span className="text-secondary-700 font-medium">Personalized Solutions</span>
                 </div>
@@ -94,9 +94,9 @@ const HeroSection: React.FC = () => {
               </div>
 
               {/* Contact Info */}
-              <div className="flex items-center space-x-4 text-secondary-600">
-                <Phone className="h-5 w-5" />
-                <span>Call us: {APP_CONFIG.contact.phone}</span>
+              <div className="flex items-center gap-3 text-sm sm:text-base text-secondary-600">
+                <Phone className="h-5 w-5 shrink-0" />
+                <span className="min-w-0 break-words">Call us: {APP_CONFIG.contact.phone}</span>
               </div>
             </div>
 
@@ -171,7 +171,7 @@ const HeroSection: React.FC = () => {
       </div>
 
       {/* Scroll Indicator */}
-      <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2">
+      <div className="absolute bottom-4 left-1/2 hidden -translate-x-1/2 transform sm:block lg:bottom-8">
         <div className="animate-bounce">
           <div className="w-6 h-10 border-2 border-primary-600 rounded-full flex justify-center">
             <div className="w-1 h-3 bg-primary-600 rounded-full mt-2 animate-pulse" />

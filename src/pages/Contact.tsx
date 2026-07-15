@@ -66,19 +66,19 @@ const Contact: React.FC = () => {
           subtitle="We're here to help with your business needs"
         />
 
-        <div className="grid lg:grid-cols-2 gap-12">
+        <div className="grid gap-10 lg:grid-cols-2 lg:gap-12">
           {/* Contact Information */}
           <div>
-            <h3 className="text-2xl font-bold text-secondary-900 mb-6">
+            <h3 className="text-xl sm:text-2xl font-bold text-secondary-900 mb-6">
               Contact Information
             </h3>
             
             <div className="space-y-6">
               <div className="flex items-start space-x-4">
-                <div className="p-3 bg-primary-100 rounded-lg">
+                <div className="shrink-0 p-3 bg-primary-100 rounded-lg">
                   <Phone className="h-6 w-6 text-primary-600" />
                 </div>
-                <div>
+                <div className="min-w-0">
                   <h4 className="font-semibold text-secondary-900 mb-1">Contact</h4>
                   <a 
                     href={`tel:${APP_CONFIG.contact.phone}`}
@@ -96,14 +96,14 @@ const Contact: React.FC = () => {
               </div>
 
               <div className="flex items-start space-x-4">
-                <div className="p-3 bg-primary-100 rounded-lg">
+                <div className="shrink-0 p-3 bg-primary-100 rounded-lg">
                   <Mail className="h-6 w-6 text-primary-600" />
                 </div>
-                <div>
+                <div className="min-w-0">
                   <h4 className="font-semibold text-secondary-900 mb-1">Email</h4>
                   <a 
                     href={`mailto:${APP_CONFIG.contact.email}`}
-                    className="text-secondary-600 hover:text-primary-600 transition-colors"
+                    className="break-words text-secondary-600 hover:text-primary-600 transition-colors"
                   >
                     {APP_CONFIG.contact.email}
                   </a>
@@ -111,10 +111,10 @@ const Contact: React.FC = () => {
               </div>
 
               <div className="flex items-start space-x-4">
-                <div className="p-3 bg-primary-100 rounded-lg">
+                <div className="shrink-0 p-3 bg-primary-100 rounded-lg">
                   <MapPin className="h-6 w-6 text-primary-600" />
                 </div>
-                <div>
+                <div className="min-w-0">
                   <h4 className="font-semibold text-secondary-900 mb-1">Location</h4>
                   <p className="text-secondary-600">
                     {APP_CONFIG.contact.address}
@@ -126,10 +126,10 @@ const Contact: React.FC = () => {
               </div>
 
               <div className="flex items-start space-x-4">
-                <div className="p-3 bg-primary-100 rounded-lg">
+                <div className="shrink-0 p-3 bg-primary-100 rounded-lg">
                   <Clock className="h-6 w-6 text-primary-600" />
                 </div>
-                <div>
+                <div className="min-w-0">
                   <h4 className="font-semibold text-secondary-900 mb-1">Business Hours</h4>
                   <p className="text-secondary-600">
                     {APP_CONFIG.contact.hours}
@@ -155,12 +155,12 @@ const Contact: React.FC = () => {
 
           {/* Contact Form */}
           <div>
-            <h3 className="text-2xl font-bold text-secondary-900 mb-6">
+            <h3 className="text-xl sm:text-2xl font-bold text-secondary-900 mb-6">
               Send us a Message
             </h3>
             
             <form onSubmit={handleSubmit} className="space-y-6">
-              <div className="grid md:grid-cols-2 gap-6">
+              <div className="grid gap-6 md:grid-cols-2">
                 <div>
                   <label htmlFor="name" className="block text-sm font-medium text-secondary-700 mb-2">
                     Full Name *
@@ -194,7 +194,7 @@ const Contact: React.FC = () => {
                 </div>
               </div>
 
-              <div className="grid md:grid-cols-2 gap-6">
+              <div className="grid gap-6 md:grid-cols-2">
                 <div>
                   <label htmlFor="phone" className="block text-sm font-medium text-secondary-700 mb-2">
                     Phone Number

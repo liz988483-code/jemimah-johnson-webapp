@@ -5,18 +5,20 @@ import Footer from '@/components/common/Footer'
 
 const MainLayout: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
-  const [headerHeight, setHeaderHeight] = useState(100)
+  const [headerHeight, setHeaderHeight] = useState(112)
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen)
 
   useEffect(() => {
+    const header = document.querySelector('header')
     const measure = () => {
-      const header = document.querySelector('header')
       if (header) setHeaderHeight(header.offsetHeight)
     }
 
     // Measure after fonts/images have loaded so logo height is final
     measure()
+    const observer = header ? new ResizeObserver(measure) : null
+    if (header) observer?.observe(header)
     window.addEventListener('resize', measure)
 
     // Re-measure after a short delay to catch logo load
@@ -24,6 +26,7 @@ const MainLayout: React.FC = () => {
 
     return () => {
       window.removeEventListener('resize', measure)
+      observer?.disconnect()
       clearTimeout(t)
     }
   }, [])
@@ -32,7 +35,8 @@ const MainLayout: React.FC = () => {
     <div className="min-h-screen flex flex-col">
       <Header isMenuOpen={isMenuOpen} toggleMenu={toggleMenu} />
       <main
-        className="flex-grow pt-3"
+        className="flex-grow"
+        style={{ paddingTop: headerHeight }}
       >
         <Outlet />
       </main>

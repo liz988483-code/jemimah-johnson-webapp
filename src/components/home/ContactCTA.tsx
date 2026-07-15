@@ -17,19 +17,19 @@ const ContactCTA: React.FC = () => {
 
         {/* Contact methods */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-          <div className="flex items-center gap-4 bg-gray-50 rounded-xl px-5 py-4">
+          <div className="flex items-center gap-4 bg-gray-50 rounded-xl px-4 py-4 sm:px-5">
             <div className="w-10 h-10 bg-primary-100 rounded-full flex items-center justify-center shrink-0">
               <Phone className="h-5 w-5 text-primary-600" />
             </div>
-            <div>
+            <div className="min-w-0">
               <p className="text-xs text-gray-500 mb-0.5">Call Us</p>
-              <a href={`tel:${APP_CONFIG.contact.phone}`} className="text-sm font-semibold text-gray-900 hover:text-primary-600 transition-colors">
+              <a href={`tel:${APP_CONFIG.contact.phone}`} className="block truncate text-sm font-semibold text-gray-900 hover:text-primary-600 transition-colors">
                 {APP_CONFIG.contact.phone}
               </a>
             </div>
           </div>
 
-          <div className="flex items-center gap-4 bg-gray-50 rounded-xl px-5 py-4">
+          <div className="flex items-center gap-4 bg-gray-50 rounded-xl px-4 py-4 sm:px-5">
             <div className="w-10 h-10 bg-primary-100 rounded-full flex items-center justify-center shrink-0">
               <Mail className="h-5 w-5 text-primary-600" />
             </div>
@@ -41,11 +41,11 @@ const ContactCTA: React.FC = () => {
             </div>
           </div>
 
-          <div className="flex items-center gap-4 bg-gray-50 rounded-xl px-5 py-4">
+          <div className="flex items-center gap-4 bg-gray-50 rounded-xl px-4 py-4 sm:px-5">
             <div className="w-10 h-10 bg-primary-100 rounded-full flex items-center justify-center shrink-0">
               <MessageSquare className="h-5 w-5 text-primary-600" />
             </div>
-            <div>
+            <div className="min-w-0">
               <p className="text-xs text-gray-500 mb-0.5">Live Chat</p>
               <button className="text-sm font-semibold text-primary-600 hover:text-primary-700 transition-colors">
                 Start Chat
@@ -58,7 +58,7 @@ const ContactCTA: React.FC = () => {
         <div className="flex justify-center">
           <Link
             to="/contact"
-            className="inline-flex items-center gap-2 bg-primary-600 text-white font-semibold text-sm px-6 py-2.5 rounded-lg hover:bg-primary-700 transition-colors"
+            className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-primary-600 px-6 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-primary-700 sm:w-auto"
           >
             Schedule Consultation
             <ArrowRight className="h-4 w-4" />
@@ -67,9 +67,9 @@ const ContactCTA: React.FC = () => {
 
         {/* Hours */}
         <div className="text-center mt-6">
-          <div className="inline-flex items-center gap-2 text-gray-500">
+          <div className="inline-flex max-w-full items-center gap-2 text-gray-500">
             <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-            <span className="text-xs">Available {APP_CONFIG.contact.hours}</span>
+            <span className="min-w-0 text-xs">Available {APP_CONFIG.contact.hours}</span>
           </div>
         </div>
       </div>

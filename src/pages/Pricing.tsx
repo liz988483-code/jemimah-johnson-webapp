@@ -17,7 +17,7 @@ const Pricing: React.FC = () => {
     : COMPANY_REGISTRATION_PACKAGES.SOLE_PARTNERSHIP
 
   return (
-    <div className="section-padding py-8">
+    <div className="section-padding py-8 sm:py-10">
       <div className="container-custom">
         <SectionTitle
           title="Transparent Pricing"
@@ -27,10 +27,10 @@ const Pricing: React.FC = () => {
         {/* Registration Packages - Combined with Tabs */}
         <section className="mb-10">
           <div className="flex justify-center mb-6">
-            <div className="bg-secondary-100 rounded-lg p-1 inline-flex">
+            <div className="grid w-full grid-cols-1 gap-1 rounded-lg bg-secondary-100 p-1 sm:inline-grid sm:w-auto sm:grid-cols-2">
               <button
                 onClick={() => setSelectedType('company')}
-                className={`px-6 py-2 rounded-md font-medium transition-all duration-200 flex items-center space-x-2 ${
+                className={`flex items-center justify-center space-x-2 rounded-md px-4 py-2 text-sm font-medium transition-all duration-200 sm:px-6 ${
                   selectedType === 'company' 
                     ? 'bg-white text-primary-600 shadow-sm' 
                     : 'text-secondary-600 hover:text-secondary-800'
@@ -41,7 +41,7 @@ const Pricing: React.FC = () => {
               </button>
               <button
                 onClick={() => setSelectedType('sole')}
-                className={`px-6 py-2 rounded-md font-medium transition-all duration-200 flex items-center space-x-2 ${
+                className={`flex items-center justify-center space-x-2 rounded-md px-4 py-2 text-sm font-medium transition-all duration-200 sm:px-6 ${
                   selectedType === 'sole' 
                     ? 'bg-white text-primary-600 shadow-sm' 
                     : 'text-secondary-600 hover:text-secondary-800'
@@ -53,7 +53,7 @@ const Pricing: React.FC = () => {
             </div>
           </div>
           
-          <div className="grid md:grid-cols-3 gap-4">
+          <div className="grid gap-4 md:grid-cols-3">
             {Object.values(packages).map((pkg) => {
               const isPopular = 'popular' in pkg && pkg.popular
               return (
@@ -61,7 +61,7 @@ const Pricing: React.FC = () => {
                   key={pkg.id}
                   className={`card relative p-4 ${
                     isPopular 
-                      ? 'ring-2 ring-primary-500 shadow-lg scale-105' 
+                      ? 'ring-2 ring-primary-500 shadow-lg md:scale-105' 
                       : ''
                   }`}
                 >
@@ -78,7 +78,7 @@ const Pricing: React.FC = () => {
                     <h3 className="text-xl font-bold text-secondary-900 mb-1">
                       {pkg.name}
                     </h3>
-                    <div className="text-3xl font-bold text-primary-600 mb-1">
+                    <div className="text-2xl font-bold text-primary-600 mb-1 sm:text-3xl">
                       KES {pkg.price.toLocaleString()}
                     </div>
                     <div className="text-xs text-secondary-600">
@@ -111,7 +111,7 @@ const Pricing: React.FC = () => {
             </p>
           </div>
           
-          <div className="grid md:grid-cols-3 gap-4">
+          <div className="grid gap-4 md:grid-cols-3">
             <div className="card p-4">
               <div className="flex items-center mb-2">
                 <div className="p-2 bg-primary-100 rounded-lg mr-2">

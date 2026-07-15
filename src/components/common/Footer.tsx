@@ -28,7 +28,7 @@ const Footer: React.FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {/* Company Info */}
             <div className="space-y-4">
-              <h3 className="text-xl font-bold text-gradient">
+              <h3 className="break-words text-xl font-bold text-gradient">
                 {APP_CONFIG.name}
               </h3>
               <p className="text-secondary-300 text-sm leading-relaxed">
@@ -99,9 +99,9 @@ const Footer: React.FC = () => {
             <div className="space-y-4">
               <h4 className="text-lg font-semibold">Contact Us</h4>
               <div className="space-y-3">
-                <div className="flex items-center space-x-3">
-                  <Phone className="h-5 w-5 text-primary-400" />
-                  <div>
+                <div className="flex items-start space-x-3">
+                  <Phone className="h-5 w-5 shrink-0 text-primary-400" />
+                  <div className="min-w-0">
                     <p className="text-sm text-secondary-300">Phone</p>
                     <a
                       href={`tel:${APP_CONFIG.contact.phone}`}
@@ -111,21 +111,21 @@ const Footer: React.FC = () => {
                     </a>
                   </div>
                 </div>
-                <div className="flex items-center space-x-3">
-                  <Mail className="h-5 w-5 text-primary-400" />
-                  <div>
+                <div className="flex items-start space-x-3">
+                  <Mail className="h-5 w-5 shrink-0 text-primary-400" />
+                  <div className="min-w-0">
                     <p className="text-sm text-secondary-300">Email</p>
                     <a
                       href={`mailto:${APP_CONFIG.contact.email}`}
-                      className="text-white hover:text-primary-400 transition-colors duration-200"
+                      className="break-words text-white hover:text-primary-400 transition-colors duration-200"
                     >
                       {APP_CONFIG.contact.email}
                     </a>
                   </div>
                 </div>
-                <div className="flex items-center space-x-3">
-                  <MapPin className="h-5 w-5 text-primary-400" />
-                  <div>
+                <div className="flex items-start space-x-3">
+                  <MapPin className="h-5 w-5 shrink-0 text-primary-400" />
+                  <div className="min-w-0">
                     <p className="text-sm text-secondary-300">Address</p>
                     <p className="text-white">{APP_CONFIG.contact.address}</p>
                   </div>
@@ -144,11 +144,11 @@ const Footer: React.FC = () => {
       {/* Bottom Bar */}
       <div className="border-t border-secondary-800">
         <div className="container-custom py-6">
-          <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
+          <div className="flex flex-col items-center justify-between gap-4 text-center md:flex-row md:text-left">
             <p className="text-sm text-secondary-400">
               © {currentYear} {APP_CONFIG.name}. All rights reserved.
             </p>
-            <div className="flex space-x-6">
+            <div className="flex flex-wrap justify-center gap-x-6 gap-y-2">
               <Link
                 to="/privacy"
                 className="text-sm text-secondary-400 hover:text-primary-400 transition-colors duration-200"
