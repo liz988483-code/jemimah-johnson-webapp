@@ -31,8 +31,10 @@ sequelize.authenticate()
     console.log('✅ Database connected')
   })
   .catch((err) => {
-    console.error('❌ PostgreSQL connection error:', err)
-    process.exit(1)
+    console.error('⚠️  Database connection error (continuing without database):', err.message)
+    console.log('ℹ️  Note: Database features will not work until a database is configured')
+    // Don't exit - allow app to run for testing
+    return Promise.resolve()
   })
 
 // Middleware
