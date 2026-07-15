@@ -1,6 +1,5 @@
 import React from 'react'
 import HeroSection from '@/components/home/HeroSection'
-import ServicesOverview from '@/components/home/ServicesOverview'
 import ContactCTA from '@/components/home/ContactCTA'
 
 const Home: React.FC = () => {
@@ -12,7 +11,6 @@ const Home: React.FC = () => {
   return (
     <div className="relative">
       <HeroSection />
-      <ServicesOverview />
       <ContactCTA />
 
       {/* Floating WhatsApp Button */}

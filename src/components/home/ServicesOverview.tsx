@@ -96,17 +96,6 @@ const ServicesOverview: React.FC = () => {
             </Link>
           ))}
         </div>
-
-        {/* CTA */}
-        <div className="text-center mt-10">
-          <Link
-            to="/services"
-            className="inline-flex items-center gap-2 bg-primary-500 hover:bg-primary-600 text-white font-semibold px-8 py-3 rounded-lg transition-colors duration-200"
-          >
-            View All Services
-            <ArrowRight className="h-4 w-4" />
-          </Link>
-        </div>
       </div>
     </section>
   )

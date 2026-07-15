@@ -32,8 +32,7 @@ const MainLayout: React.FC = () => {
     <div className="min-h-screen flex flex-col">
       <Header isMenuOpen={isMenuOpen} toggleMenu={toggleMenu} />
       <main
-        className="flex-grow"
-        style={{ paddingTop: `${headerHeight}px` }}
+        className="flex-grow pt-3"
       >
         <Outlet />
       </main>
