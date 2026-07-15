@@ -38,7 +38,7 @@ services:
       - key: ADMIN_PASSWORD
         generateValue: true
       - key: FRONTEND_URL
-        value: https://jemimah-johnstone-webapp.vercel.app
+        value: https://jemimah-johnson-webapp.vercel.app
 
 databases:
   - name: jemimah-johnson-db
