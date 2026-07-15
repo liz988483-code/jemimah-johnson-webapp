@@ -146,26 +146,26 @@ const Header: React.FC<HeaderProps> = ({ isMenuOpen, toggleMenu }) => {
     <>
       {/* ===== HEADER ===== */}
       <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        isScrolled ? 'bg-white shadow-lg py-3 lg:py-4' : 'bg-white/95 backdrop-blur-sm py-3 lg:py-5'
+        isScrolled ? 'bg-white shadow-lg py-2.5 lg:py-4' : 'bg-white/95 backdrop-blur-sm py-2.5 lg:py-5'
       }`}>
         <div className="container-custom">
-          <div className="flex items-center justify-between gap-3 lg:gap-4">
+          <div className="flex items-center justify-between gap-2 sm:gap-3 lg:gap-4">
 
             {/* Logo */}
-            <Link to="/" className="flex min-w-0 items-center gap-3 sm:gap-4 shrink">
+            <Link to="/" className="flex min-w-0 items-center gap-2.5 sm:gap-4 shrink">
               <img
                 src="/images/logo.svg.jpeg"
                 alt={APP_CONFIG.name}
                 className="h-14 w-14 sm:h-16 sm:w-16 xl:h-20 xl:w-20 object-contain shrink-0"
               />
               <div className="flex min-w-0 flex-col justify-center">
-                <div className="max-w-[210px] text-sm font-black leading-tight text-secondary-900 sm:max-w-none sm:text-base xl:text-xl">
+                <div className="max-w-[210px] text-[13px] font-black leading-tight text-secondary-900 min-[390px]:text-sm sm:max-w-none sm:text-base xl:text-xl">
                   JEMIMAH JOHNSTONE & ASSOCIATES
                 </div>
-                <div className="mt-1 hidden text-[11px] font-bold uppercase tracking-wider text-primary-500 sm:block xl:text-sm">
+                <div className="mt-0.5 block truncate text-[9px] font-bold uppercase tracking-wider text-primary-500 min-[390px]:text-[10px] sm:text-[11px] xl:text-sm">
                   YOUR FINANCIAL SOLUTION PARTNER
                 </div>
-                <div className="mt-0.5 hidden text-xs italic text-secondary-600 xl:block">
+                <div className="mt-0.5 block truncate text-[8px] italic text-secondary-600 min-[390px]:text-[9px] sm:text-[10px] xl:text-xs">
                   Accurate, Relevant and Reliable financial solutions.
                 </div>
               </div>

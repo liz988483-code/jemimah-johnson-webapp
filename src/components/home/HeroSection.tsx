@@ -38,14 +38,14 @@ const coreServices = [
 
 const HeroSection: React.FC = () => {
   return (
-    <section className="relative flex min-h-[calc(100vh-7rem)] items-center justify-center overflow-hidden">
+    <section className="relative flex min-h-0 items-start justify-center overflow-hidden lg:min-h-[calc(100vh-7rem)] lg:items-center">
       {/* Background */}
       <div className="absolute inset-0 bg-gradient-to-br from-primary-50 via-white to-secondary-50">
         <div className="absolute inset-0 bg-black/5" />
       </div>
 
       {/* Content */}
-      <div className="relative z-10 section-padding py-12 sm:py-16">
+      <div className="relative z-10 w-full px-4 pb-12 pt-8 sm:px-6 sm:py-14 lg:px-16 lg:py-16">
         <div className="container-custom">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-12 items-center">
             {/* Left Content */}
