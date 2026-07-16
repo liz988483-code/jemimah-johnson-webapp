@@ -1,6 +1,6 @@
 import { Request, Response } from 'express'
 import axios from 'axios'
-import { mpesaConfig, generateTimestamp, generatePassword, getSTKPushCallbackUrl } from '../config/mpesa'
+import { mpesaConfig, generateTimestamp, generatePassword, getSTKPushCallbackUrl, validateMpesaPaymentConfig, getMpesaConfigSummary } from '../config/mpesa'
 import { createAuditLog } from './auditLogController'
 
 interface AuthRequest extends Request {
@@ -41,7 +41,7 @@ const getOAuthToken = async (): Promise<string> => {
     console.error('Error getting OAuth token:', error.response?.data || error.message)
 
     if (status === 400 || status === 401) {
-      throw new Error('M-Pesa rejected the consumer key/secret. Confirm your Daraja sandbox app credentials in .env.')
+      throw new Error(`M-Pesa rejected the consumer key/secret. Confirm the ${mpesaConfig.environment} Daraja app consumer key and consumer secret in Render. Current config: ${getMpesaConfigSummary()}.`)
     }
 
     throw new Error(safaricomError || 'Failed to get OAuth token from M-Pesa')
@@ -72,10 +72,11 @@ export const initiateSTKPush = async (req: AuthRequest, res: Response) => {
       })
     }
 
-    if (!mpesaConfig.passkey || !mpesaConfig.shortcode) {
+    const configError = validateMpesaPaymentConfig()
+    if (configError) {
       return res.status(500).json({
         success: false,
-        message: 'M-Pesa shortcode or passkey is missing'
+        message: configError
       })
     }
 
@@ -113,7 +114,7 @@ export const initiateSTKPush = async (req: AuthRequest, res: Response) => {
       BusinessShortCode: mpesaConfig.shortcode,
       Password: password,
       Timestamp: timestamp,
-      TransactionType: 'CustomerPayBillOnline',
+      TransactionType: mpesaConfig.transactionType,
       Amount: paymentAmount,
       PartyA: formattedPhone,
       PartyB: mpesaConfig.shortcode,
@@ -164,9 +165,14 @@ export const initiateSTKPush = async (req: AuthRequest, res: Response) => {
     })
   } catch (error: any) {
     console.error('Error initiating STK Push:', error.response?.data || error.message)
+    const safaricomMessage = error.response?.data?.errorMessage || error.response?.data?.error
+    const message = safaricomMessage === 'Wrong credentials'
+      ? `M-Pesa rejected the payment credentials. Confirm Render has the matching MPESA_ENVIRONMENT, MPESA_CONSUMER_KEY, MPESA_CONSUMER_SECRET, MPESA_SHORTCODE, MPESA_PASSKEY, and MPESA_TRANSACTION_TYPE for your Daraja app. Current config: ${getMpesaConfigSummary()}.`
+      : safaricomMessage || error.message || 'Failed to initiate STK Push'
+
     res.status(500).json({
       success: false,
-      message: error.response?.data?.errorMessage || error.message || 'Failed to initiate STK Push'
+      message
     })
   }
 }

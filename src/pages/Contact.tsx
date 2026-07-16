@@ -14,6 +14,9 @@ interface FormData {
 }
 
 const Contact: React.FC = () => {
+  const primaryPhoneHref = `tel:${APP_CONFIG.contact.phone.replace(/[^\d+]/g, '')}`
+  const secondaryPhoneHref = `tel:${APP_CONFIG.contact.phone_secondary.replace(/[^\d+]/g, '')}`
+
   const [formData, setFormData] = useState<FormData>({
     name: '',
     email: '',
@@ -43,13 +46,16 @@ const Contact: React.FC = () => {
         body: JSON.stringify(formData)
       })
 
-      const result = await response.json()
+      const result = await response.json().catch(() => ({
+        success: false,
+        message: 'Server returned an invalid response'
+      }))
 
-      if (result.success) {
+      if (response.ok && result.success) {
         alert('Thank you for your inquiry. We will contact you soon!')
         setFormData({ name: '', email: '', phone: '', service: '', message: '' })
       } else {
-        alert('Something went wrong: ' + result.message)
+        alert('Something went wrong: ' + (result.message || 'Please try again or call us directly.'))
       }
     } catch (error) {
       alert('Could not send message. Please try again or call us directly.')
@@ -81,13 +87,13 @@ const Contact: React.FC = () => {
                 <div className="min-w-0">
                   <h4 className="font-semibold text-secondary-900 mb-1">Contact</h4>
                   <a 
-                    href={`tel:${APP_CONFIG.contact.phone}`}
+                    href={primaryPhoneHref}
                     className="text-secondary-600 hover:text-primary-600 transition-colors block"
                   >
                     {APP_CONFIG.contact.phone}
                   </a>
                   <a 
-                    href={`tel:${APP_CONFIG.contact.phone_secondary}`}
+                    href={secondaryPhoneHref}
                     className="text-secondary-600 hover:text-primary-600 transition-colors block"
                   >
                     {APP_CONFIG.contact.phone_secondary}
@@ -147,7 +153,7 @@ const Contact: React.FC = () => {
               <p className="text-secondary-600 mb-4">
                 Need immediate assistance? Call us directly for a quick consultation.
               </p>
-              <Button className="w-full">
+              <Button href={primaryPhoneHref} className="w-full">
                 Call Now
               </Button>
             </div>

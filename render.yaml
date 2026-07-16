@@ -51,8 +51,10 @@ services:
         sync: false
       - key: MPESA_SHORTCODE
         sync: false
+      - key: MPESA_TRANSACTION_TYPE
+        value: CustomerPayBillOnline
       - key: MPESA_ENVIRONMENT
-        value: production
+        value: sandbox
       - key: MPESA_CALLBACK_URL
         value: https://jemimah-johnson-api.onrender.com/api/mpesa
       - key: EMAIL_HOST
