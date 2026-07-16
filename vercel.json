@@ -12,6 +12,6 @@
     }
   ],
   "env": {
-    "VITE_API_URL": "https://jemimah-johnson-api.onrender.com"
+    "VITE_API_URL": "/api"
   }
 }

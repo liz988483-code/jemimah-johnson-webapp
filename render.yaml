@@ -1,9 +1,9 @@
 services:
   - type: web
-    name: jemimah-johnson-backend
+    name: jemimah-johnson-api
     env: node
-    buildCommand: cd backend && npm install && npm run build
-    startCommand: cd backend && npm start
+    buildCommand: npm install --include=dev && npm run build:backend
+    startCommand: node backend/dist/server.js
     envVars:
       - key: NODE_ENV
         value: production
@@ -39,6 +39,32 @@ services:
         generateValue: true
       - key: FRONTEND_URL
         value: https://jemimah-johnson-webapp.vercel.app
+      - key: CORS_ORIGINS
+        value: https://jemimah-johnson-webapp.vercel.app
+      - key: DB_DIALECT
+        value: postgres
+      - key: MPESA_CONSUMER_KEY
+        sync: false
+      - key: MPESA_CONSUMER_SECRET
+        sync: false
+      - key: MPESA_PASSKEY
+        sync: false
+      - key: MPESA_SHORTCODE
+        sync: false
+      - key: MPESA_ENVIRONMENT
+        value: production
+      - key: MPESA_CALLBACK_URL
+        value: https://jemimah-johnson-api.onrender.com/api/mpesa
+      - key: EMAIL_HOST
+        sync: false
+      - key: EMAIL_PORT
+        value: 587
+      - key: EMAIL_USER
+        sync: false
+      - key: EMAIL_PASS
+        sync: false
+      - key: EMAIL_FROM
+        sync: false
 
 databases:
   - name: jemimah-johnson-db

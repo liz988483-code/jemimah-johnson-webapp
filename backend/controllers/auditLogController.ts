@@ -39,7 +39,7 @@ export const createAuditLog = async (data: {
 
 // Middleware to log document access
 export const logDocumentAccess = (action: 'view' | 'download' | 'upload' | 'delete' | 'update') => {
-  return async (req: AuditRequest, res: Response, next: any) => {
+  return async (req: AuditRequest, _res: Response, next: any) => {
     const user = req.user || req.clientUser
     
     if (user) {

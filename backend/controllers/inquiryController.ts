@@ -54,14 +54,20 @@ export const createInquiry = async (req: Request, res: Response) => {
       inquiryData.packageTier = null
     }
     
-    const inquiry = await Inquiry.create(inquiryData)
+    let inquiry = null
+
+    try {
+      inquiry = await Inquiry.create(inquiryData)
+    } catch (dbError: any) {
+      console.error('Inquiry CRM save failed; continuing with notification:', dbError.message)
+    }
     
     // Send email notification
     await sendInquiryNotification(inquiryData)
     
     res.status(201).json({
       success: true,
-      message: 'Inquiry submitted successfully',
+      message: inquiry ? 'Inquiry submitted successfully' : 'Inquiry notification submitted successfully',
       data: inquiry
     })
   } catch (error: any) {

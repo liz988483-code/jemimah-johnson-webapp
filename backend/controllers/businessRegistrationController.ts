@@ -50,7 +50,7 @@ export const createRegistration = async (req: Request, res: Response) => {
 // Get all registrations (for admin)
 export const getRegistrations = async (req: Request, res: Response) => {
   try {
-    const { page = 1, limit = 10, status, search } = req.query
+    const { page = 1, limit = 10, status } = req.query
     
     const whereClause: any = {}
     

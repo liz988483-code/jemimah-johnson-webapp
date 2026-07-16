@@ -1,12 +1,9 @@
 import React, { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import SectionTitle from '@/components/common/SectionTitle'
 import Button from '@/components/common/Button'
 import { apiUrl } from '@/config/api'
 import { Users, CheckCircle, Briefcase, TrendingUp, Target, X } from 'lucide-react'
 
 const Advisory: React.FC = () => {
-  const navigate = useNavigate()
   const [isFormOpen, setIsFormOpen] = useState(false)
   const [formData, setFormData] = useState({
     name: '',
@@ -57,7 +54,10 @@ const Advisory: React.FC = () => {
         body: JSON.stringify(payload)
       })
 
-      const data = await response.json()
+      const data = await response.json().catch(() => ({
+        success: false,
+        message: 'Server returned an invalid response'
+      }))
 
       if (!response.ok) {
         throw new Error(data.message || `Server error: ${response.status}`)

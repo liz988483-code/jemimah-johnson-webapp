@@ -2,7 +2,10 @@ import dotenv from 'dotenv'
 import path from 'path'
 
 dotenv.config()
+dotenv.config({ path: path.resolve(process.cwd(), '.env') })
 dotenv.config({ path: path.resolve(process.cwd(), '../.env') })
+dotenv.config({ path: path.resolve(__dirname, '../../.env') })
+dotenv.config({ path: path.resolve(__dirname, '../../../.env') })
 
 export const mpesaConfig = {
   consumerKey: process.env.MPESA_CONSUMER_KEY || '',

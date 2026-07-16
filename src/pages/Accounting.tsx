@@ -1,12 +1,9 @@
 import React, { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import SectionTitle from '@/components/common/SectionTitle'
 import Button from '@/components/common/Button'
 import { apiUrl } from '@/config/api'
 import { TrendingUp, CheckCircle, Clock, DollarSign, FileText, X } from 'lucide-react'
 
 const Accounting: React.FC = () => {
-  const navigate = useNavigate()
   const [isFormOpen, setIsFormOpen] = useState(false)
   const [formData, setFormData] = useState({
     name: '',
@@ -33,22 +30,30 @@ const Accounting: React.FC = () => {
 
   // --- MPESA INTEGRATION FUNCTION ---
   const triggerMpesaPush = async (phone: string, amount: number) => {
-    try {
-      const formattedPhone = phone.startsWith('0') ? '254' + phone.substring(1) : phone
-      const response = await fetch(apiUrl('/mpesa/stkpush'), {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          phoneNumber: formattedPhone,
-          amount: amount
-        })
+    const formattedPhone = phone.replace(/\D/g, '').startsWith('0')
+      ? `254${phone.replace(/\D/g, '').substring(1)}`
+      : phone.replace(/\D/g, '')
+    const response = await fetch(apiUrl('/mpesa/stkpush'), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        phoneNumber: formattedPhone,
+        amount,
+        accountReference: formData.company || formData.name || 'JJA Accounting',
+        transactionDesc: 'Accounting service payment'
       })
-      const data = await response.json()
-      return data.ResponseCode === "0"
-    } catch (err) {
-      console.error("Mpesa Error:", err)
-      return false
+    })
+
+    const data = await response.json().catch(() => ({
+      success: false,
+      message: 'Payment server returned an invalid response'
+    }))
+
+    if (!response.ok || !data.success) {
+      throw new Error(data.message || 'Failed to initiate M-Pesa payment')
     }
+
+    return data.ResponseCode === '0' || data.data?.ResponseCode === '0'
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -61,7 +66,7 @@ const Accounting: React.FC = () => {
       const mpesaInitiated = await triggerMpesaPush(formData.phone, 10000)
 
       if (!mpesaInitiated) {
-        throw new Error("Failed to initiate M-Pesa payment. Please check your number and try again.")
+        throw new Error('M-Pesa did not accept the payment request. Please try again or call us directly.')
       }
 
       // 2. SUBMIT DATA TO YOUR BACKEND
@@ -85,7 +90,10 @@ const Accounting: React.FC = () => {
         body: JSON.stringify(payload)
       })
 
-      const data = await response.json()
+      const data = await response.json().catch(() => ({
+        success: false,
+        message: 'Server returned an invalid response'
+      }))
 
       if (!response.ok) {
         throw new Error(data.message || `Server error: ${response.status}`)

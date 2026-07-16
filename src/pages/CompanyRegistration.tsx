@@ -45,8 +45,8 @@ const CompanyRegistration: React.FC = () => {
   // --- MPESA INTEGRATION FUNCTION ---
   const triggerMpesaPush = async (phone: string, amount: number) => {
     try {
-      // Formats 07... to 2547...
-      const formattedPhone = phone.startsWith('0') ? '254' + phone.substring(1) : phone
+      const digitsOnly = phone.replace(/\D/g, '')
+      const formattedPhone = digitsOnly.startsWith('0') ? `254${digitsOnly.substring(1)}` : digitsOnly
 
       const response = await fetch(apiUrl('/mpesa/stkpush'), {
         method: 'POST',
@@ -59,7 +59,10 @@ const CompanyRegistration: React.FC = () => {
         })
       })
 
-      const data = await response.json()
+      const data = await response.json().catch(() => ({
+        success: false,
+        message: 'Payment server returned an invalid response'
+      }))
       if (!response.ok || !data.success) {
         throw new Error(data.message || 'Failed to initiate M-Pesa payment')
       }
@@ -81,7 +84,7 @@ const CompanyRegistration: React.FC = () => {
       const mpesaInitiated = await triggerMpesaPush(form.phone, selectedPkg.price)
 
       if (!mpesaInitiated) {
-        throw new Error("Failed to initiate M-Pesa payment. Please check your number and try again.")
+        throw new Error('M-Pesa did not accept the payment request. Please try again or call us directly.')
       }
 
       // 2. SUBMIT DATA TO YOUR BACKEND
@@ -99,7 +102,10 @@ const CompanyRegistration: React.FC = () => {
         })
       })
 
-      const data = await response.json()
+      const data = await response.json().catch(() => ({
+        success: false,
+        message: 'Server returned an invalid response'
+      }))
 
       if (data.success) {
         setSuccess(true)

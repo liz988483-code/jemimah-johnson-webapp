@@ -179,20 +179,17 @@ export const handleSTKPushCallback = async (req: Request, res: Response) => {
     
     const resultCode = stkCallback.ResultCode
     const resultDesc = stkCallback.ResultDesc
-    const merchantRequestID = stkCallback.MerchantRequestID
     const callbackMetadata = stkCallback.CallbackMetadata
     
     // Extract metadata
     let amount = 0
     let mpesaReceiptNumber = ''
-    let transactionDate = ''
     let phoneNumber = ''
     
     if (callbackMetadata && callbackMetadata.Item) {
       callbackMetadata.Item.forEach((item: any) => {
         if (item.Name === 'Amount') amount = parseFloat(item.Value)
         if (item.Name === 'MpesaReceiptNumber') mpesaReceiptNumber = item.Value
-        if (item.Name === 'TransactionDate') transactionDate = item.Value
         if (item.Name === 'PhoneNumber') phoneNumber = item.Value
       })
     }
@@ -280,7 +277,7 @@ export const querySTKPushStatus = async (req: AuthRequest, res: Response) => {
 }
 
 // Register C2B URLs (for receiving payments)
-export const registerC2BUrls = async (req: Request, res: Response) => {
+export const registerC2BUrls = async (_req: Request, res: Response) => {
   try {
     // Get OAuth token
     const accessToken = await getOAuthToken()
@@ -321,12 +318,10 @@ export const registerC2BUrls = async (req: Request, res: Response) => {
 }
 
 // C2B Validation Callback
-export const handleC2BValidation = async (req: Request, res: Response) => {
+export const handleC2BValidation = async (_req: Request, res: Response) => {
   try {
     // Validate the transaction
     // Return true to accept, false to reject
-    const { TransactionType, TransID, TransAmount, BillRefNumber, MSISDN } = req.body
-
     // Add your validation logic here
     // For now, accept all transactions
     res.json({
@@ -345,7 +340,7 @@ export const handleC2BValidation = async (req: Request, res: Response) => {
 // C2B Confirmation Callback
 export const handleC2BConfirmation = async (req: Request, res: Response) => {
   try {
-    const { TransactionType, TransID, TransAmount, BillRefNumber, MSISDN } = req.body
+    const { TransID, TransAmount, BillRefNumber, MSISDN } = req.body
 
     // Log the confirmation
     await createAuditLog({

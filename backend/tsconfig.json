@@ -11,12 +11,12 @@
     "noImplicitAny": false,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
-    "outDir": "./",
+    "outDir": "./dist",
     "rootDir": "./",
     "resolveJsonModule": true,
     "declaration": false,
     "sourceMap": false
   },
   "include": ["./**/*.ts"],
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules", "dist"]
 }

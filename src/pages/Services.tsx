@@ -1,7 +1,7 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
 import SectionTitle from '@/components/common/SectionTitle'
-import { TrendingUp, Shield, Users, Building, FileText, Briefcase } from 'lucide-react'
+import { TrendingUp, Shield, Users, Building, FileText } from 'lucide-react'
 
 const Services: React.FC = () => {
   const services = [

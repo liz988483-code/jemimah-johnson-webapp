@@ -3,40 +3,50 @@ import Client from '../models/Client'
 import { Op } from 'sequelize'
 import { sendContactNotification, sendServiceRequestNotification } from '../services/emailService'
 
+const getClientServices = (client: any): string[] => {
+  return Array.isArray(client.services) ? client.services : []
+}
+
 // Submit contact form
 export const submitContact = async (req: Request, res: Response) => {
   try {
     const contactData = req.body
+    let client = null
     
-    // Check if client already exists
-    let client = await Client.findOne({ where: { email: contactData.email } })
-    
-    if (!client) {
-      // Create new client if doesn't exist
-      client = await Client.create({
-        name: contactData.name,
-        email: contactData.email,
-        phone: contactData.phone,
-        company: contactData.company,
-        services: contactData.service ? [contactData.service] : [],
-        status: 'prospect'
-      })
-    } else {
-      // Update existing client
-      const updateData: any = {}
-      if (contactData.company && !client.company) {
-        updateData.company = contactData.company
-      }
-      if (contactData.service && !client.services.includes(contactData.service)) {
-        updateData.services = [...client.services, contactData.service]
-      }
-      if (client.status === 'prospect') {
-        updateData.status = 'active'
-      }
+    try {
+      // Check if client already exists
+      client = await Client.findOne({ where: { email: contactData.email } })
       
-      if (Object.keys(updateData).length > 0) {
-        await client.update(updateData)
+      if (!client) {
+        // Create new client if doesn't exist
+        client = await Client.create({
+          name: contactData.name,
+          email: contactData.email,
+          phone: contactData.phone,
+          company: contactData.company,
+          services: contactData.service ? [contactData.service] : [],
+          status: 'prospect'
+        })
+      } else {
+        // Update existing client
+        const updateData: any = {}
+        if (contactData.company && !client.company) {
+          updateData.company = contactData.company
+        }
+        const services = getClientServices(client)
+        if (contactData.service && !services.includes(contactData.service)) {
+          updateData.services = [...services, contactData.service]
+        }
+        if (client.status === 'prospect') {
+          updateData.status = 'active'
+        }
+        
+        if (Object.keys(updateData).length > 0) {
+          await client.update(updateData)
+        }
       }
+    } catch (dbError: any) {
+      console.error('Contact form CRM save failed; continuing with notification:', dbError.message)
     }
     
     // Send email notification
@@ -81,8 +91,9 @@ export const submitServiceRequest = async (req: Request, res: Response) => {
       if (requestData.company && !client.company) {
         updateData.company = requestData.company
       }
-      if (!client.services.includes(requestData.specificService)) {
-        updateData.services = [...client.services, requestData.specificService]
+      const services = getClientServices(client)
+      if (!services.includes(requestData.specificService)) {
+        updateData.services = [...services, requestData.specificService]
       }
       if (client.status === 'prospect') {
         updateData.status = 'active'

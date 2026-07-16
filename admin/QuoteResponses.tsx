@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { CheckCircle, X, DollarSign } from 'lucide-react'
+import { X } from 'lucide-react'
 import Button from '@/components/common/Button'
 import { apiUrl } from '@/config/api'
 
