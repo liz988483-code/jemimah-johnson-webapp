@@ -1,0 +1,82 @@
+# This app joins the external "embrace-network" shared with every other stack on this VPS
+# (inventory-system, authentication, etc.) so the shared Caddy reverse proxy can reach it by
+# container name -- embrace-proxy's Caddyfile already has:
+#   jemimahandassociates.com, www.jemimahandassociates.com { reverse_proxy jemimah-app:80 }
+# That only resolves because this "app" service's container_name is jemimah-app and it's on
+# that same network. Create the network once per host before starting any stack:
+#   docker network create embrace-network
+
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: jemimah-db
+    restart: always
+    environment:
+      POSTGRES_DB: ${DB_NAME:-jemimah_johnson}
+      POSTGRES_USER: ${DB_USER:-jemimah_johnson_user}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD must be set in .env}
+      TZ: Africa/Nairobi
+    ports:
+      - "127.0.0.1:5433:5432"
+    volumes:
+      - jemimah_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-jemimah_johnson_user} -d ${DB_NAME:-jemimah_johnson}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: jemimah-app
+    restart: always
+    environment:
+      - NODE_ENV=production
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_DIALECT=postgres
+      - DB_NAME=${DB_NAME:-jemimah_johnson}
+      - DB_USER=${DB_USER:-jemimah_johnson_user}
+      - DB_PASSWORD=${DB_PASSWORD:?DB_PASSWORD must be set in .env}
+      - JWT_SECRET=${JWT_SECRET:?JWT_SECRET must be set in .env}
+      - JWT_EXPIRE=${JWT_EXPIRE:-30d}
+      - ADMIN_EMAIL=${ADMIN_EMAIL:-admin@jemimahjohnson.com}
+      - ADMIN_PASSWORD=${ADMIN_PASSWORD:?ADMIN_PASSWORD must be set in .env}
+      # Real public domain -- must match the Caddyfile block above, not the container name,
+      # since it's used for CORS and for building links the browser has to resolve itself.
+      - FRONTEND_URL=${FRONTEND_URL:-https://jemimahandassociates.com}
+      - CORS_ORIGINS=${CORS_ORIGINS:-https://jemimahandassociates.com,https://www.jemimahandassociates.com}
+      - EMAIL_HOST=${EMAIL_HOST:-smtp.gmail.com}
+      - EMAIL_PORT=${EMAIL_PORT:-587}
+      - EMAIL_USER=${EMAIL_USER:-}
+      - EMAIL_PASS=${EMAIL_PASS:-}
+      - EMAIL_FROM=${EMAIL_FROM:-noreply@jemimahjohnson.com}
+      - MPESA_CONSUMER_KEY=${MPESA_CONSUMER_KEY:-}
+      - MPESA_CONSUMER_SECRET=${MPESA_CONSUMER_SECRET:-}
+      - MPESA_PASSKEY=${MPESA_PASSKEY:-}
+      - MPESA_SHORTCODE=${MPESA_SHORTCODE:-174379}
+      - MPESA_TRANSACTION_TYPE=${MPESA_TRANSACTION_TYPE:-CustomerPayBillOnline}
+      - MPESA_ENVIRONMENT=${MPESA_ENVIRONMENT:-sandbox}
+      - MPESA_CALLBACK_URL=${MPESA_CALLBACK_URL:-https://jemimahandassociates.com/api/mpesa/callback}
+      - ENCRYPTION_KEY=${ENCRYPTION_KEY:?ENCRYPTION_KEY must be set in .env}
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost/api/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - default
+      - embrace-network
+
+volumes:
+  jemimah_postgres_data:
+
+networks:
+  embrace-network:
+    external: true
