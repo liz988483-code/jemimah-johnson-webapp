@@ -1,4 +1,4 @@
-import { Routes, Route, Navigate } from 'react-router-dom'
+import { Routes, Route } from 'react-router-dom'
 import MainLayout from './layouts/MainLayout'
 import Home from './pages/Home'
 import Services from './pages/Services'
@@ -18,6 +18,7 @@ import Clients from '../admin/Clients'
 import Inquiries from '../admin/Inquiries'
 import Packages from '../admin/Packages'
 import QuoteResponses from '../admin/QuoteResponses' // ← ADD THIS IMPORT
+import AdminLogin from '../admin/Login'
 import ClientLogin from './pages/ClientLogin'
 import ClientRegister from './pages/ClientRegister'
 import ClientDashboard from './pages/ClientDashboard'
@@ -44,7 +45,7 @@ function App() {
         </Route>
 
         {/* Admin Routes */}
-        <Route path="/admin/login" element={<Navigate to="/login" replace />} />
+        <Route path="/admin/login" element={<AdminLogin />} />
         <Route element={<ProtectedRoute><AdminLayout /></ProtectedRoute>}>
           <Route path="/admin/dashboard" element={<Dashboard />} />
           <Route path="/admin/clients" element={<Clients />} />
