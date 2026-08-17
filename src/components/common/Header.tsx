@@ -99,12 +99,31 @@ const Header: React.FC<HeaderProps> = ({ isMenuOpen, toggleMenu }) => {
         body: JSON.stringify({ email: loginForm.email, password: loginForm.password }),
       })
       const data = await res.json()
-      if (!res.ok) throw new Error(data.message || 'Login failed')
-      localStorage.setItem('clientToken', data.data.token)
-      localStorage.setItem('clientUser', JSON.stringify(data.data.user))
-      setClientUser(data.user)
-      setIsAuthModalOpen(false)
-      navigate('/dashboard')
+      if (data.success) {
+        localStorage.setItem('clientToken', data.data.token)
+        localStorage.setItem('clientUser', JSON.stringify(data.data.user))
+        setClientUser(data.data.user)
+        setIsAuthModalOpen(false)
+        navigate('/dashboard')
+        return
+      }
+
+      // Fall back to admin login
+      const adminRes = await fetch('/api/admin/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: loginForm.email, password: loginForm.password }),
+      })
+      const adminData = await adminRes.json()
+      if (adminData.success) {
+        localStorage.setItem('adminToken', adminData.token)
+        localStorage.setItem('adminUser', JSON.stringify(adminData.user))
+        setIsAuthModalOpen(false)
+        navigate('/admin/dashboard')
+        return
+      }
+
+      throw new Error(data.message || 'Login failed')
     } catch (err: any) {
       setAuthError(err.message)
     } finally {
@@ -130,7 +149,7 @@ const Header: React.FC<HeaderProps> = ({ isMenuOpen, toggleMenu }) => {
       if (!res.ok) throw new Error(data.message || 'Registration failed')
       localStorage.setItem('clientToken', data.data.token)
       localStorage.setItem('clientUser', JSON.stringify(data.data.user))
-      setClientUser(data.user)
+      setClientUser(data.data.user)
       setIsAuthModalOpen(false)
       navigate('/dashboard')
     } catch (err: any) {

@@ -7,7 +7,7 @@ import {
   getEntityDocuments,
   deleteDocument
 } from '../controllers/documentController'
-import { authenticate } from '../middleware/auth'
+import { authenticate, requireAdmin } from '../middleware/auth'
 
 const router = Router()
 
@@ -54,7 +54,7 @@ router.get('/info/:id', getDocumentInfo)
 // Get documents for an entity
 router.get('/entity/:entityType/:entityId', getEntityDocuments)
 
-// Delete a document
-router.delete('/:id', deleteDocument)
+// Delete a document (admin only)
+router.delete('/:id', requireAdmin, deleteDocument)
 
 export default router

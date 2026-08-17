@@ -9,12 +9,12 @@ interface AuthRequest extends Request {
     email: string
     role: string
   }
-  clientUser?: {
-    id: number
-    email: string
-  }
   file?: Express.Multer.File
 }
+
+// Non-admins may only access documents they uploaded themselves.
+const canAccessDocument = (user: { email: string; role: string }, document: Document) =>
+  user.role === 'admin' || document.uploadedByEmail === user.email
 
 // Upload and encrypt a document
 export const uploadDocument = async (req: AuthRequest, res: Response) => {
@@ -27,7 +27,7 @@ export const uploadDocument = async (req: AuthRequest, res: Response) => {
     }
 
     const { entityType, entityId } = req.body
-    const user = req.user || req.clientUser
+    const user = req.user
 
     if (!user) {
       return res.status(401).json({
@@ -74,7 +74,7 @@ export const uploadDocument = async (req: AuthRequest, res: Response) => {
     await createAuditLog({
       userId: user.id,
       userEmail: user.email,
-      userType: req.user ? 'admin' : 'client',
+      userType: user.role as 'admin' | 'client',
       action: 'upload',
       entityType: 'document',
       entityId: document.id,
@@ -108,7 +108,7 @@ export const uploadDocument = async (req: AuthRequest, res: Response) => {
 export const downloadDocument = async (req: AuthRequest, res: Response) => {
   try {
     const { id } = req.params
-    const user = req.user || req.clientUser
+    const user = req.user
 
     if (!user) {
       return res.status(401).json({
@@ -132,6 +132,13 @@ export const downloadDocument = async (req: AuthRequest, res: Response) => {
       })
     }
 
+    if (!canAccessDocument(user, document)) {
+      return res.status(403).json({
+        success: false,
+        message: 'You do not have access to this document'
+      })
+    }
+
     // Get encryption key
     const encryptionKey = getEncryptionKey()
 
@@ -152,7 +159,7 @@ export const downloadDocument = async (req: AuthRequest, res: Response) => {
     await createAuditLog({
       userId: user.id,
       userEmail: user.email,
-      userType: req.user ? 'admin' : 'client',
+      userType: user.role as 'admin' | 'client',
       action: 'download',
       entityType: 'document',
       entityId: document.id,
@@ -179,7 +186,7 @@ export const downloadDocument = async (req: AuthRequest, res: Response) => {
 export const getDocumentInfo = async (req: AuthRequest, res: Response) => {
   try {
     const { id } = req.params
-    const user = req.user || req.clientUser
+    const user = req.user
 
     if (!user) {
       return res.status(401).json({
@@ -202,11 +209,18 @@ export const getDocumentInfo = async (req: AuthRequest, res: Response) => {
       })
     }
 
+    if (!canAccessDocument(user, document)) {
+      return res.status(403).json({
+        success: false,
+        message: 'You do not have access to this document'
+      })
+    }
+
     // Log the view action
     await createAuditLog({
       userId: user.id,
       userEmail: user.email,
-      userType: req.user ? 'admin' : 'client',
+      userType: user.role as 'admin' | 'client',
       action: 'view',
       entityType: 'document',
       entityId: document.id,
@@ -244,7 +258,7 @@ export const getDocumentInfo = async (req: AuthRequest, res: Response) => {
 export const getEntityDocuments = async (req: AuthRequest, res: Response) => {
   try {
     const { entityType, entityId } = req.params
-    const user = req.user || req.clientUser
+    const user = req.user
 
     if (!user) {
       return res.status(401).json({
@@ -262,9 +276,11 @@ export const getEntityDocuments = async (req: AuthRequest, res: Response) => {
       order: [['createdAt', 'DESC']]
     })
 
+    const visibleDocuments = documents.filter(doc => canAccessDocument(user, doc))
+
     res.json({
       success: true,
-      data: documents.map(doc => ({
+      data: visibleDocuments.map(doc => ({
         id: doc.id,
         fileName: doc.originalName,
         fileSize: doc.fileSize,
@@ -288,7 +304,7 @@ export const getEntityDocuments = async (req: AuthRequest, res: Response) => {
 export const deleteDocument = async (req: AuthRequest, res: Response) => {
   try {
     const { id } = req.params
-    const user = req.user || req.clientUser
+    const user = req.user
 
     if (!user) {
       return res.status(401).json({
@@ -321,7 +337,7 @@ export const deleteDocument = async (req: AuthRequest, res: Response) => {
     await createAuditLog({
       userId: user.id,
       userEmail: user.email,
-      userType: req.user ? 'admin' : 'client',
+      userType: user.role as 'admin' | 'client',
       action: 'delete',
       entityType: 'document',
       entityId: document.id,

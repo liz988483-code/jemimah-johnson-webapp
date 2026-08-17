@@ -46,7 +46,7 @@ const ClientPortal: React.FC = () => {
   const handleLogout = () => {
     localStorage.removeItem('clientToken')
     localStorage.removeItem('clientUser')
-    navigate('/client/login')
+    navigate('/login')
   }
 
   useEffect(() => {
@@ -57,7 +57,7 @@ const ClientPortal: React.FC = () => {
     try {
       const token = localStorage.getItem('clientToken')
       if (!token) {
-        navigate('/client/login')
+        navigate('/login')
         return
       }
 
