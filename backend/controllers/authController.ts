@@ -6,9 +6,17 @@ export const adminLogin = async (req: Request, res: Response) => {
     const email = (req.body.email || '').trim()
     const password = (req.body.password || '').trim()
 
-    // Validate credentials from environment variables
-    const adminEmail = (process.env.ADMIN_EMAIL || 'admin@jemimahjohnson.com').trim()
-    const adminPassword = (process.env.ADMIN_PASSWORD || 'jemimah@2024').trim()
+    // Credentials must come from the environment (.env on the server) - no baked-in fallback
+    if (!process.env.ADMIN_EMAIL || !process.env.ADMIN_PASSWORD) {
+      console.error('Admin login misconfigured: ADMIN_EMAIL/ADMIN_PASSWORD not set in environment')
+      return res.status(500).json({
+        success: false,
+        message: 'Admin login is not configured on this server'
+      })
+    }
+
+    const adminEmail = process.env.ADMIN_EMAIL.trim()
+    const adminPassword = process.env.ADMIN_PASSWORD.trim()
 
     const emailMatches = email.toLowerCase() === adminEmail.toLowerCase()
     const passwordMatches = password === adminPassword
