@@ -3,15 +3,14 @@ import { sequelize } from './config/database'
 
 const PORT = process.env.PORT || 5001
 
-// Connect DB - ENABLED with FORCE SYNC
+// Connect DB and create any tables that don't exist yet (no alter/force - won't touch existing tables)
 sequelize.authenticate()
   .then(() => {
     console.log('✅ PostgreSQL connected successfully')
-    // Don't sync - just let it run
-    return Promise.resolve()
+    return sequelize.sync()
   })
   .then(() => {
-    console.log('✅ Database connected')
+    console.log('✅ Database connected and synchronized')
   })
   .catch((err) => {
     console.error('⚠️  Database connection error (continuing without database):', err.message)
