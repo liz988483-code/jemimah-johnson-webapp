@@ -158,7 +158,7 @@ const Taxation: React.FC = () => {
               <div className="flex items-center justify-between flex-wrap gap-4">
                 <div>
                   <div className="text-sm text-secondary-600 mb-1">Starting price</div>
-                  <div className="text-3xl font-bold text-primary-600">KES 15,000/year</div>
+                  <div className="text-3xl font-bold text-primary-600">KES 15,000/month</div>
                 </div>
                 <Button 
                   variant="primary" 

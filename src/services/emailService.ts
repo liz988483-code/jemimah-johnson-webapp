@@ -40,7 +40,7 @@ export const sendContactNotification = async (contactData: any): Promise<void> =
   `
 
   return sendEmail({
-    to: 'info@jemimahjohnson.com',
+    to: 'info@jemimahjohnstone.com',
     subject,
     body,
     replyTo: contactData.email,
@@ -66,7 +66,7 @@ export const sendInquiryNotification = async (inquiryData: any): Promise<void> =
   `
 
   return sendEmail({
-    to: 'info@jemimahjohnson.com',
+    to: 'jemimahjohnstoneandassociates@gmail.com',
     subject,
     body,
     replyTo: inquiryData.email,
@@ -97,7 +97,7 @@ export const sendServiceRequestNotification = async (requestData: any): Promise<
   `
 
   return sendEmail({
-    to: 'info@jemimahjohnson.com',
+    to: 'info@jemimahjohnstone.com',
     subject,
     body,
     replyTo: requestData.email,

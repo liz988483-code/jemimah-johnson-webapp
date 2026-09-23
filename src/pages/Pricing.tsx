@@ -142,7 +142,7 @@ const Pricing: React.FC = () => {
                 {SERVICES.TAXATION.description}
               </p>
               <div className="text-xl font-bold text-primary-600">
-                KES 15,000/year
+                KES 15,000/month
               </div>
             </div>
 
