@@ -16,7 +16,7 @@ import {
   deleteInquiry
 } from '../controllers/inquiryController'
 import { adminLogin } from '../controllers/authController'
-import { authenticate } from '../middleware/auth'
+import { authenticate, requireAdmin } from '../middleware/auth'
 import registrationRoutes from './registrations'
 
 const router = Router()
@@ -27,8 +27,9 @@ router.post('/login', [
   body('password').notEmpty().withMessage('Password is required')
 ], adminLogin)
 
-// Apply authentication middleware to all admin routes
+// Apply authentication + admin role check to all admin routes
 router.use(authenticate)
+router.use(requireAdmin)
 
 // Inquiry management routes (admin only)
 router.get('/inquiries', getInquiries)

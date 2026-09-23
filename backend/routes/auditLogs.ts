@@ -4,14 +4,15 @@ import {
   getEntityAuditLogs,
   getUserAuditLogs
 } from '../controllers/auditLogController'
-import { authenticate } from '../middleware/auth'
+import { authenticate, requireAdmin } from '../middleware/auth'
 
 const router = Router()
 
-// All audit log routes require authentication
+// All audit log routes require admin authentication
 router.use(authenticate)
+router.use(requireAdmin)
 
-// Get all audit logs (admin only - add admin middleware later)
+// Get all audit logs
 router.get('/', getAllAuditLogs)
 
 // Get audit logs for a specific entity

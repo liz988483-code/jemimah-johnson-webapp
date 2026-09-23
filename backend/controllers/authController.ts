@@ -3,13 +3,31 @@ import jwt from 'jsonwebtoken'
 
 export const adminLogin = async (req: Request, res: Response) => {
   try {
-    const { email, password } = req.body
+    const email = (req.body.email || '').trim()
+    const password = (req.body.password || '').trim()
 
-    // Validate credentials from environment variables
-    const adminEmail = process.env.ADMIN_EMAIL || 'admin@jemimahjohnson.com'
-    const adminPassword = process.env.ADMIN_PASSWORD || 'jemimah@2024'
+    // Credentials must come from the environment (.env on the server) - no baked-in fallback
+    if (!process.env.ADMIN_EMAIL || !process.env.ADMIN_PASSWORD) {
+      console.error('Admin login misconfigured: ADMIN_EMAIL/ADMIN_PASSWORD not set in environment')
+      return res.status(500).json({
+        success: false,
+        message: 'Admin login is not configured on this server'
+      })
+    }
 
-    if (email !== adminEmail || password !== adminPassword) {
+    const adminEmail = process.env.ADMIN_EMAIL.trim()
+    const adminPassword = process.env.ADMIN_PASSWORD.trim()
+
+    const emailMatches = email.toLowerCase() === adminEmail.toLowerCase()
+    const passwordMatches = password === adminPassword
+
+    if (!emailMatches || !passwordMatches) {
+      console.warn('Admin login rejected', {
+        receivedEmail: email,
+        expectedEmail: adminEmail,
+        emailMatches,
+        passwordMatches
+      })
       return res.status(401).json({
         success: false,
         message: 'Invalid credentials'

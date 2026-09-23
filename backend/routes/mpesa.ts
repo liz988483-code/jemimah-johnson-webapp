@@ -7,7 +7,7 @@ import {
   handleC2BValidation,
   handleC2BConfirmation
 } from '../controllers/mpesaController'
-import { authenticate } from '../middleware/auth'
+import { authenticate, requireAdmin } from '../middleware/auth'
 
 const router = Router()
 
@@ -23,7 +23,7 @@ router.use(authenticate)
 // Query STK Push status
 router.get('/stkpush/status/:merchantRequestID', querySTKPushStatus)
 
-// Register C2B URLs (admin only - add admin middleware later)
-router.post('/c2b/register', registerC2BUrls)
+// Register C2B URLs
+router.post('/c2b/register', requireAdmin, registerC2BUrls)
 
 export default router
