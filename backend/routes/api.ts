@@ -21,6 +21,7 @@ import {
   getPackagesByType, 
   getPackageById 
 } from '../controllers/registrationController'
+import { authenticate, requireAdmin } from '../middleware/auth'
 
 const router = Router()
 
@@ -59,6 +60,7 @@ router.post('/inquiry', [
   body('urgency').optional({ checkFalsy: true }).isIn(['low', 'medium', 'high']).withMessage('Valid urgency level is required')
 ], handleValidationErrors, createInquiry)
 
+router.use('/inquiries', authenticate, requireAdmin)
 router.get('/inquiries', getInquiries)
 router.get('/inquiries/:id', getInquiryById)
 router.patch('/inquiries/:id/status', updateInquiryStatus)
@@ -84,6 +86,7 @@ router.post('/service-request', [
 ], handleValidationErrors, submitServiceRequest)
 
 // Client routes (admin)
+router.use('/clients', authenticate, requireAdmin)
 router.get('/clients', getClients)
 router.get('/clients/:id', getClientById)
 router.patch('/clients/:id', updateClient)

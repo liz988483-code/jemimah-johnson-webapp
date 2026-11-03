@@ -1,5 +1,29 @@
 import request from 'supertest'
+import jwt from 'jsonwebtoken'
 import app from '../app'
+
+describe('admin access control', () => {
+  it.each(['/api/inquiries', '/api/clients'])('rejects unauthenticated access to %s', async (path) => {
+    const res = await request(app).get(path)
+
+    expect(res.status).toBe(401)
+    expect(res.body.success).toBe(false)
+  })
+
+  it('rejects client tokens from admin data endpoints', async () => {
+    const token = jwt.sign(
+      { id: 'client', email: 'client@test.local', role: 'client' },
+      process.env.JWT_SECRET as string
+    )
+
+    const res = await request(app)
+      .get('/api/clients')
+      .set('Authorization', `Bearer ${token}`)
+
+    expect(res.status).toBe(403)
+    expect(res.body.message).toBe('Admin access required')
+  })
+})
 
 describe('POST /api/inquiry validation', () => {
   it('rejects a payload missing required fields', async () => {

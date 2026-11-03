@@ -16,7 +16,12 @@ const QuoteResponses: React.FC = () => {
 
   const fetchQuoteRequests = async () => {
     try {
-      const response = await fetch(apiUrl('/inquiries?status=Quote Requested'))
+      const token = localStorage.getItem('adminToken')
+      const response = await fetch(apiUrl('/inquiries?status=Quote Requested'), {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      })
       const data = await response.json()
       if (data.success) {
         setQuotes(data.data)
