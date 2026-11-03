@@ -77,7 +77,7 @@ export const COMPANY_REGISTRATION_PACKAGES = {
     basic: {
       id: 'company-basic',
       name: 'Basic',
-      price: 15000,
+      price: 30000,
       features: [
         'Incorporating Certificate',
         'CR 1, CR 2, CR 8, CR 12',
@@ -88,7 +88,7 @@ export const COMPANY_REGISTRATION_PACKAGES = {
     standard: {
       id: 'company-standard',
       name: 'Standard',
-      price: 25000,
+      price: 50000,
       features: [
         'Incorporating Certificate',
         'CR 1, CR 2, CR 8, CR 12',
@@ -105,7 +105,7 @@ export const COMPANY_REGISTRATION_PACKAGES = {
     premium: {
       id: 'company-premium',
       name: 'Premium',
-      price: 40000,
+      price: 90000,
       features: [
         'Incorporating Certificate',
         'CR 1, CR 2, CR 8, CR 12',
